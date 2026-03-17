@@ -1,5 +1,5 @@
-/* LAZ LAB sw.js — v16b */
-const C = 'llv16b';
+/* LAZ LAB sw.js — v2.0 */
+const C = 'llv2';
 const A = ['./', './index.html', './manifest.json',
            './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', e => {
