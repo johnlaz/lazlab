@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAZ LAB | Neural Command Hub</title>
+    <!--
+      v16 — STABLE BUILD
+      Stable as of: 2026-03-17
+      Features: STABLE/TEST channels per slot, session snapshots,
+                slot notes, flag events, error fingerprinting,
+                Groq manual triage (record→review→triage),
+                Send to Claude export, PNG + PDF portfolio export,
+                localStorage quota-safe save (zip data in-memory only)
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style"
+          href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=optional"
+          onload="this.rel='stylesheet'">
+    <link rel="icon" type="image/png" sizes="32x32"   href="icons/icon-96.png">
+    <link rel="icon" type="image/png" sizes="96x96"   href="icons/icon-96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+    <link rel="apple-touch-icon"                      href="icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="152x152"      href="icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="192x192"      href="icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512"      href="icons/icon-512.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Laz Lab">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileImage" content="icons/icon-144.png">
+    <meta name="msapplication-TileColor" content="#bc13fe">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#040406;--panel:#08080d;--p2:#0d0d15;--p3:#0b0b14;
+  --accent:#ff3c3c;--text:#e8e8f0;--dim:#5a5a7a;--border:#1e1e2e;
+  --glow:#bc13fe;--glow-d:rgba(188,19,254,.15);
+  --cyan:#5ef1ff;--cyan-d:rgba(94,241,255,.12);
+  --green:#39ff14;--warn:#ff9500;--gold:#f0c040;
+  --fb:'Rajdhani','Arial Narrow',Arial,sans-serif;
+  --fm:'Share Tech Mono','Courier New',Courier,monospace;
+  --fd:'Orbitron','Arial Black',Arial,sans-serif;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{display:flex;font-family:var(--fb);color:var(--text);position:fixed;inset:0}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;
+  background:repeating-linear-gradient(180deg,transparent 0,transparent 3px,rgba(0,0,0,.03) 3px,rgba(0,0,0,.03) 4px)}
+
+/* ── SIDEBAR ── */
+#sidebar{width:340px;flex-shrink:0;height:100%;overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;background:var(--panel);border-right:1px solid var(--border)}
+.logo-block{flex-shrink:0;text-align:center;padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.logo-img-wrap{width:76px;height:76px;margin:0 auto 8px;border-radius:15px;overflow:hidden;background:#0c0c18}
+.logo-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;filter:drop-shadow(0 0 12px var(--glow));border-radius:15px}
+.logo-title{font-family:var(--fd);font-size:1.25em;font-weight:900;letter-spacing:6px;color:#fff;text-transform:uppercase}
+.logo-sub{font-family:var(--fm);font-size:9px;letter-spacing:3px;color:var(--glow);margin-top:3px}
+
+/* Tab nav */
+.tab-nav{flex-shrink:0;display:flex;border-bottom:1px solid var(--border)}
+.tab-btn{flex:1;padding:9px 2px;cursor:pointer;background:transparent;border:none;
+  font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--dim);
+  text-transform:uppercase;border-bottom:2px solid transparent}
+.tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.tab-btn:hover:not(.active){color:var(--text)}
+
+.sb-panel{display:none;flex-direction:column;flex:1;min-height:0;overflow-y:auto}
+.sb-panel.active{display:flex}
+
+/* Shared button system */
+.btn{cursor:pointer;border:none;padding:10px 14px;border-radius:6px;
+  font-family:var(--fb);font-weight:700;width:100%;font-size:11px;
+  text-transform:uppercase;letter-spacing:2px}
+.btn-primary{background:linear-gradient(135deg,#7b00c8,var(--glow));color:#fff}
+.btn-secondary{background:var(--p2);color:var(--cyan);border:1px solid var(--cyan-d)}
+.btn-ghost{background:transparent;color:var(--dim);border:1px solid var(--border);font-size:10px;padding:8px}
+.btn-warn{background:var(--p2);color:var(--warn);border:1px solid rgba(255,149,0,.2);font-size:10px;padding:8px}
+.sec-label{font-family:var(--fm);font-size:9px;color:var(--cyan);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+
+/* ── HOME panel ── */
+.home-actions{flex-shrink:0;padding:11px 13px;display:flex;flex-direction:column;gap:7px;border-bottom:1px solid var(--border)}
+#app-list{padding:11px 13px}
+.no-slots{text-align:center;padding:18px 0;font-family:var(--fm);font-size:10px;color:var(--dim);letter-spacing:2px}
+
+.slot{background:var(--p2);padding:12px 13px;border-radius:10px;margin-bottom:8px;border:1px solid var(--border);position:relative}
+.slot.has-stable{border-color:rgba(94,241,255,.22)}
+.slot.debugging{border-color:rgba(188,19,254,.5);box-shadow:0 0 10px rgba(188,19,254,.1)}
+.slot-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;padding-right:16px}
+.slot-name{font-family:var(--fd);color:var(--cyan);font-size:10px;font-weight:700;letter-spacing:1px;word-break:break-word}
+.slot-ver{background:var(--glow);color:#fff;padding:1px 6px;border-radius:4px;font-family:var(--fm);font-size:9px;white-space:nowrap;flex-shrink:0}
+.slot-focus{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.slot-desc{font-size:11px;color:#7070a0;line-height:1.4;margin-bottom:7px}
+.slot-del{position:absolute;top:9px;right:9px;background:none;border:none;color:#2a2a3a;cursor:pointer;font-size:13px;line-height:1;padding:0}
+.slot-del:hover{color:var(--accent)}
+
+/* Channel rows */
+.channels{display:flex;flex-direction:column;gap:5px;margin-bottom:7px}
+.channel-row{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:5px 8px}
+.channel-row.has-zip{border-color:rgba(94,241,255,.2)}
+.ch-badge{font-family:var(--fm);font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:2px 6px;border-radius:3px;flex-shrink:0}
+.ch-badge.stable{background:rgba(57,255,20,.12);color:var(--green);border:1px solid rgba(57,255,20,.25)}
+.ch-badge.test{background:rgba(255,149,0,.1);color:var(--warn);border:1px solid rgba(255,149,0,.25)}
+.ch-file{font-family:var(--fm);font-size:9px;color:var(--dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-file.loaded{color:var(--text)}
+.ch-actions{display:flex;gap:4px;flex-shrink:0}
+.ch-btn{padding:3px 7px;cursor:pointer;background:transparent;border:1px solid var(--border);
+  border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.ch-btn:hover{color:var(--text);border-color:#444}
+.ch-btn.promote{color:var(--green);border-color:rgba(57,255,20,.25)}
+.ch-btn.promote:hover{background:rgba(57,255,20,.08)}
+.ch-btn.launch{color:var(--glow);border-color:var(--glow-d)}
+.ch-btn.launch:hover{background:var(--glow-d)}
+.pick-label{display:block;cursor:pointer;background:#0a0a12;border:1px dashed #28284a;
+  border-radius:5px;padding:5px 8px;font-family:var(--fm);font-size:9px;color:#484868;text-align:center}
+.pick-label:hover{border-color:var(--glow);color:var(--glow)}
+.pick-label input{display:none}
+
+/* Slot notes */
+.slot-notes-wrap{margin-top:6px}
+.slot-notes{width:100%;background:#060609;border:1px solid var(--border);color:#7878a0;
+  padding:7px 9px;border-radius:6px;font-family:var(--fm);font-size:10px;
+  line-height:1.5;resize:none;height:60px;display:block}
+.slot-notes:focus{outline:none;border-color:var(--glow-d)}
+.slot-notes-footer{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.slot-notes-hint{font-family:var(--fm);font-size:8px;color:var(--dim);letter-spacing:1px}
+.slot-notes-save{padding:3px 8px;cursor:pointer;background:transparent;border:1px solid var(--border);
+  border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--dim);text-transform:uppercase}
+.slot-notes-save:hover{color:var(--green);border-color:rgba(57,255,20,.3)}
+
+/* Snapshots badge */
+.snap-count{display:inline-block;background:rgba(188,19,254,.12);border:1px solid var(--glow-d);
+  color:var(--glow);padding:1px 6px;border-radius:3px;font-family:var(--fm);font-size:8px;margin-left:5px}
+
+/* ── DEBUG sidebar panel ── */
+.debug-sb{padding:11px 13px;overflow-y:auto}
+.debug-status-box{background:var(--p2);border:1px solid var(--border);border-radius:8px;padding:9px;margin-bottom:9px}
+.dsb-label{font-family:var(--fm);font-size:8px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.dsb-name{font-family:var(--fd);font-size:12px;color:var(--cyan);font-weight:700;letter-spacing:1px}
+.dsb-channel{font-family:var(--fm);font-size:9px;color:var(--warn);margin-top:2px}
+.dsb-none{font-family:var(--fm);font-size:10px;color:var(--dim)}
+
+.debug-controls{display:flex;flex-direction:column;gap:6px;margin-bottom:9px}
+.debug-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:9px}
+.stat-box{background:var(--p2);border:1px solid var(--border);border-radius:7px;padding:8px;text-align:center}
+.stat-num{font-family:var(--fd);font-size:19px;font-weight:900;color:var(--text);line-height:1}
+.stat-num.err{color:var(--accent)} .stat-num.warn{color:var(--warn)}
+.stat-num.net{color:var(--cyan)}   .stat-num.clk{color:var(--green)}
+.stat-lbl{font-family:var(--fm);font-size:8px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* Fingerprint table */
+.fp-section{margin-bottom:9px}
+.fp-row{display:flex;align-items:center;gap:6px;padding:5px 7px;
+  background:var(--p2);border:1px solid var(--border);border-radius:5px;margin-bottom:4px}
+.fp-count{font-family:var(--fd);font-size:11px;color:var(--accent);font-weight:700;min-width:24px}
+.fp-msg{font-family:var(--fm);font-size:9px;color:#8888aa;flex:1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-empty{font-family:var(--fm);font-size:9px;color:var(--dim);text-align:center;padding:8px 0;letter-spacing:1px}
+
+/* Triage & groq output */
+.triage-btn{width:100%;padding:10px;cursor:pointer;
+  background:linear-gradient(135deg,#7b00c8,var(--glow));border:none;border-radius:7px;
+  font-family:var(--fb);font-weight:700;font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:#fff;margin-bottom:6px}
+.send-claude-btn{width:100%;padding:9px;cursor:pointer;
+  background:var(--p2);border:1px solid rgba(240,192,64,.3);border-radius:7px;
+  font-family:var(--fb);font-weight:700;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.clear-log-btn{width:100%;padding:7px;cursor:pointer;background:transparent;
+  border:1px solid var(--border);border-radius:6px;font-family:var(--fb);
+  font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+#triage-out{overflow:hidden;max-height:0;background:#060609;border-radius:8px;
+  font-family:var(--fm);font-size:10px;line-height:1.7;color:#8888aa;white-space:pre-wrap;margin-top:7px}
+#triage-out.open{max-height:280px;overflow-y:auto;border:1px solid var(--border);padding:9px}
+
+/* Snapshots list */
+.snapshots-section{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+.snap-row{display:flex;align-items:center;gap:6px;padding:5px 7px;
+  background:var(--p2);border:1px solid var(--border);border-radius:5px;margin-bottom:4px;cursor:pointer}
+.snap-row:hover{border-color:#333}
+.snap-ts{font-family:var(--fm);font-size:9px;color:var(--dim);flex:1}
+.snap-app{font-family:var(--fm);font-size:9px;color:var(--cyan)}
+.snap-counts{font-family:var(--fm);font-size:8px;color:var(--dim)}
+.snap-del{background:none;border:none;color:#2a2a3a;cursor:pointer;font-size:11px;padding:0}
+.snap-del:hover{color:var(--accent)}
+
+/* ── ROADMAP panel ── */
+.roadmap-panel{padding:13px;overflow-y:auto}
+#project-notes{background:#060609;border:1px solid var(--border);color:#8888aa;
+  padding:10px;border-radius:8px;width:100%;height:170px;resize:none;
+  font-family:var(--fm);font-size:11px;line-height:1.6;margin-bottom:8px;display:block}
+#project-notes:focus{outline:none;border-color:var(--glow-d)}
+.note-tools{display:flex;gap:6px;margin-bottom:8px}
+.tool-btn{flex:1;padding:8px 4px;font-family:var(--fb);font-size:10px;font-weight:700;
+  background:var(--p2);color:var(--dim);border:1px solid var(--border);border-radius:6px;
+  cursor:pointer;text-transform:uppercase;letter-spacing:1px}
+.tool-btn.ai{color:var(--glow);border-color:var(--glow-d)}
+#groq-log{overflow:hidden;max-height:0;background:#060609;border-radius:8px;
+  font-family:var(--fm);font-size:10px;line-height:1.6;margin-bottom:8px}
+#groq-log.open{max-height:100px;overflow-y:auto;border:1px solid var(--border);padding:8px 10px}
+#groq-log .l-ai{color:var(--glow)} #groq-log .l-ok{color:var(--green)} #groq-log .l-err{color:var(--accent)}
+.key-wrap{background:#060609;border:1px solid var(--border);border-radius:8px;padding:8px}
+.key-wrap input{width:100%;background:#0a0a12;border:1px solid #1a1a2e;color:var(--text);
+  padding:7px 8px;border-radius:5px;font-family:var(--fm);font-size:10px;margin-top:4px}
+.key-wrap input:focus{outline:none;border-color:var(--glow)}
+
+/* Sys footer */
+#sys-footer{flex-shrink:0;padding:9px 13px;border-top:1px solid var(--border);display:flex;gap:5px}
+.sys-btn{flex:1;padding:6px;cursor:pointer;background:transparent;color:var(--dim);
+  border:1px solid var(--border);border-radius:5px;font-family:var(--fb);
+  font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.sys-btn:hover{color:var(--text);border-color:#333}
+#import-input{display:none}
+
+/* ── MAIN ── */
+#main{flex:1;height:100%;overflow:hidden;position:relative;background:var(--bg);display:flex;flex-direction:column}
+.main-view{position:absolute;inset:0;opacity:0;pointer-events:none;display:flex;flex-direction:column}
+.main-view.active{opacity:1;pointer-events:auto}
+
+/* HOME view */
+#v-home{align-items:center;justify-content:center;text-align:center}
+#v-home h1{font-family:var(--fd);font-size:clamp(2rem,6vw,4.8rem);font-weight:900;
+  letter-spacing:.3em;color:#fff;text-shadow:0 0 60px rgba(188,19,254,.35);min-height:1.2em;line-height:1.2}
+#v-home p{font-family:var(--fm);font-size:11px;letter-spacing:.5em;color:var(--dim);margin-top:14px;text-transform:uppercase}
+#v-home::before,#v-home::after{content:'';position:absolute;width:60px;height:60px;border-color:rgba(188,19,254,.18);border-style:solid}
+#v-home::before{top:28px;left:28px;border-width:2px 0 0 2px}
+#v-home::after{bottom:28px;right:28px;border-width:0 2px 2px 0}
+
+/* DEBUG view */
+#v-debug{flex-direction:row}
+.debug-viewport{flex:1;position:relative;background:#000;border-right:1px solid var(--border);display:flex;flex-direction:column}
+.debug-toolbar{flex-shrink:0;height:36px;background:var(--panel);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;padding:0 12px}
+.dbg-title{font-family:var(--fm);font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;flex:1}
+.dbg-ch-tag{font-family:var(--fm);font-size:8px;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:1px}
+.dbg-ch-tag.stable{background:rgba(57,255,20,.1);color:var(--green);border:1px solid rgba(57,255,20,.25)}
+.dbg-ch-tag.test{background:rgba(255,149,0,.1);color:var(--warn);border:1px solid rgba(255,149,0,.25)}
+.dbg-pill{padding:2px 8px;border-radius:20px;font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:1px}
+.dbg-pill.live{background:rgba(57,255,20,.15);color:var(--green);border:1px solid rgba(57,255,20,.3)}
+.dbg-pill.idle{background:rgba(90,90,122,.1);color:var(--dim);border:1px solid var(--border)}
+.dbg-pill.err{background:rgba(255,60,60,.12);color:var(--accent);border:1px solid rgba(255,60,60,.3)}
+#debug-frame{flex:1;border:none;background:#fff;display:block;width:100%}
+.frame-ph{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.frame-ph p{font-family:var(--fm);font-size:11px;color:var(--dim);letter-spacing:3px;text-transform:uppercase}
+
+/* Event feed */
+.event-feed{width:370px;flex-shrink:0;display:flex;flex-direction:column;background:var(--panel)}
+.feed-header{flex-shrink:0;height:36px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 10px;gap:7px}
+.feed-title{font-family:var(--fm);font-size:9px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;flex:1}
+.feed-snap-btn{padding:2px 8px;cursor:pointer;background:transparent;border:1px solid rgba(188,19,254,.3);
+  border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--glow);text-transform:uppercase;letter-spacing:1px}
+.feed-clear{padding:2px 8px;cursor:pointer;background:transparent;border:1px solid var(--border);
+  border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--dim);text-transform:uppercase}
+#event-list{flex:1;overflow-y:auto;padding:7px;display:flex;flex-direction:column;gap:2px}
+.ev{padding:4px 7px;border-radius:5px;font-family:var(--fm);font-size:10px;
+  line-height:1.5;border-left:2px solid transparent;background:var(--p2);
+  word-break:break-word;position:relative;cursor:pointer}
+.ev:hover .ev-flag-btn{opacity:1}
+.ev-ts{color:var(--dim);font-size:9px;margin-right:5px}
+.ev-type{font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-right:5px;font-weight:bold}
+.ev.log{border-color:#333} .ev.log .ev-type{color:#666}
+.ev.warn{border-color:var(--warn);background:rgba(255,149,0,.05)} .ev.warn .ev-type{color:var(--warn)}
+.ev.error{border-color:var(--accent);background:rgba(255,60,60,.06)} .ev.error .ev-type{color:var(--accent)}
+.ev.click{border-color:var(--green);background:rgba(57,255,20,.03)} .ev.click .ev-type{color:var(--green)}
+.ev.net{border-color:var(--cyan);background:rgba(94,241,255,.03)} .ev.net .ev-type{color:var(--cyan)}
+.ev.info{border-color:var(--glow);background:rgba(188,19,254,.03)} .ev.info .ev-type{color:var(--glow)}
+.ev.flagged{box-shadow:inset 3px 0 0 var(--gold);border-left-color:var(--gold) !important}
+.ev-flag-btn{position:absolute;right:5px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:11px;color:var(--dim);
+  opacity:0;padding:0;line-height:1}
+.ev-flag-btn.on{opacity:1;color:var(--gold)}
+.ev.dupe{opacity:.55}
+.ev-dupe-badge{display:inline-block;background:rgba(255,60,60,.15);color:var(--accent);
+  font-size:8px;padding:0 4px;border-radius:3px;margin-left:4px;font-family:var(--fm)}
+.feed-empty{flex:1;display:flex;align-items:center;justify-content:center;
+  font-family:var(--fm);font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase}
+
+/* PORTFOLIO view */
+#v-portfolio{overflow:hidden}
+.port-header{flex-shrink:0;display:flex;justify-content:space-between;align-items:center;
+  padding:22px 34px 14px;border-bottom:1px solid var(--border)}
+.port-header h2{font-family:var(--fd);font-size:1.05em;font-weight:700;letter-spacing:5px;color:#fff}
+.port-header .sub{font-family:var(--fm);font-size:9px;color:var(--dim);letter-spacing:2px;margin-top:3px}
+.port-actions{display:flex;gap:8px}
+.port-btn{padding:8px 16px;border-radius:6px;font-family:var(--fb);font-weight:700;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none}
+.port-btn.export{background:var(--accent);color:#fff}
+.port-btn.png{background:var(--p2);color:var(--cyan);border:1px solid var(--cyan-d)}
+#port-grid{flex:1;overflow-y:auto;padding:18px 34px 34px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;align-content:start}
+.card{background:linear-gradient(135deg,#0c0c18,#0a0a14);border:1px solid #1a1a2e;
+  border-radius:13px;padding:18px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--glow),transparent);opacity:.5}
+.card-num{position:absolute;top:11px;right:13px;font-family:var(--fm);font-size:8px;color:var(--dim);letter-spacing:1px}
+.card-top{display:flex;align-items:center;gap:13px;margin-bottom:12px}
+.card-icon-wrap{width:56px;height:56px;flex-shrink:0;border-radius:11px;overflow:hidden;background:#0c0c18;box-shadow:0 0 9px rgba(188,19,254,.2)}
+.card-icon-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.card-info{flex:1;min-width:0}
+.card-name{font-family:var(--fd);font-size:12px;font-weight:700;color:#fff;letter-spacing:1px;
+  margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-ver{display:inline-block;background:rgba(188,19,254,.18);border:1px solid rgba(188,19,254,.35);
+  color:var(--glow);padding:1px 6px;border-radius:4px;font-family:var(--fm);font-size:9px;margin-bottom:4px}
+.card-focus{font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:2px}
+.card-div{height:1px;margin:10px 0;background:linear-gradient(90deg,rgba(188,19,254,.18),rgba(94,241,255,.1),transparent)}
+.card-desc{font-family:var(--fb);font-size:12px;color:#8888aa;line-height:1.5;margin-bottom:10px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{background:rgba(94,241,255,.06);border:1px solid rgba(94,241,255,.14);color:var(--cyan);
+  padding:2px 7px;border-radius:4px;font-family:var(--fm);font-size:9px;text-transform:uppercase}
+.card-foot{margin-top:10px;padding-top:9px;border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 5px var(--green);margin-right:5px;animation:blink 2.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.status-txt{font-family:var(--fm);font-size:9px;color:var(--green);text-transform:uppercase}
+.card-brand{font-family:var(--fd);font-size:8px;color:var(--dim);letter-spacing:2px}
+.port-empty{grid-column:1/-1;text-align:center;padding:60px 0;font-family:var(--fm);color:var(--dim);font-size:11px;letter-spacing:3px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:#1c1c2e;border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<div id="sidebar">
+  <div class="logo-block">
+    <div class="logo-img-wrap"><img src="icons/icon-192.png" alt="LAZ LAB"></div>
+    <div class="logo-title">Laz Lab</div>
+    <div class="logo-sub">Neural Command Hub · v16 Stable</div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="sbTab('home')"    id="stab-home">HOME</button>
+    <button class="tab-btn"        onclick="sbTab('debug')"   id="stab-debug">DEBUG</button>
+    <button class="tab-btn"        onclick="sbTab('snaps')"   id="stab-snaps">SNAPS</button>
+    <button class="tab-btn"        onclick="sbTab('roadmap')" id="stab-roadmap">PLAN</button>
+  </div>
+
+  <!-- HOME -->
+  <div class="sb-panel active" id="sp-home">
+    <div class="home-actions">
+      <button class="btn btn-primary"   onclick="mainTab('portfolio')">⬡ Portfolio</button>
+      <button class="btn btn-secondary" onclick="createSlot()">+ New App Slot</button>
+    </div>
+    <div id="app-list"></div>
+  </div>
+
+  <!-- DEBUG -->
+  <div class="sb-panel" id="sp-debug">
+    <div class="debug-sb">
+      <div class="debug-status-box">
+        <div class="dsb-label">Debug Target</div>
+        <div id="dbg-target-name"><span class="dsb-none">— None selected —</span></div>
+        <div id="dbg-target-ch"></div>
+      </div>
+
+      <div class="debug-controls">
+        <button class="btn btn-primary" onclick="launchDebug()">▶ Launch Session</button>
+        <button class="btn btn-ghost"   onclick="stopDebug()">■ Stop</button>
+      </div>
+
+      <div class="debug-stat-grid">
+        <div class="stat-box"><div class="stat-num err"  id="stat-err">0</div><div class="stat-lbl">Errors</div></div>
+        <div class="stat-box"><div class="stat-num warn" id="stat-wrn">0</div><div class="stat-lbl">Warns</div></div>
+        <div class="stat-box"><div class="stat-num net"  id="stat-net">0</div><div class="stat-lbl">Network</div></div>
+        <div class="stat-box"><div class="stat-num clk"  id="stat-clk">0</div><div class="stat-lbl">Clicks</div></div>
+      </div>
+
+      <!-- Error fingerprints -->
+      <div class="fp-section">
+        <div class="sec-label" style="margin-bottom:5px">Unique Errors</div>
+        <div id="fp-list"><div class="fp-empty">No errors yet</div></div>
+      </div>
+
+      <button class="triage-btn"      onclick="groqTriage()">✦ Triage Session with Groq</button>
+      <button class="send-claude-btn" onclick="sendToClaude()">⬡ Send to Claude</button>
+      <button class="clear-log-btn"   onclick="clearFeed()">Clear Event Feed</button>
+      <div id="triage-out"></div>
+    </div>
+  </div>
+
+  <!-- SNAPSHOTS -->
+  <div class="sb-panel" id="sp-snaps">
+    <div style="padding:11px 13px;overflow-y:auto">
+      <div class="sec-label">Session Snapshots</div>
+      <div id="snap-list"></div>
+      <div id="snap-view" style="display:none;margin-top:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div class="sec-label" style="margin-bottom:0">Snapshot Detail</div>
+          <button onclick="closeSnapView()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:11px;font-family:var(--fm)">✕ close</button>
+        </div>
+        <div id="snap-detail-meta" style="font-family:var(--fm);font-size:9px;color:var(--dim);margin-bottom:8px;line-height:1.6"></div>
+        <div id="snap-detail-log" style="background:#060609;border:1px solid var(--border);border-radius:7px;padding:9px;font-family:var(--fm);font-size:9px;color:#8888aa;line-height:1.6;max-height:400px;overflow-y:auto;white-space:pre-wrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div class="sb-panel" id="sp-roadmap">
+    <div class="roadmap-panel">
+      <div class="sec-label">Neural Roadmap</div>
+      <textarea id="project-notes" placeholder="Dump raw thoughts…&#10;Hit AI CLEAN to structure."></textarea>
+      <div class="note-tools">
+        <button class="tool-btn ai" onclick="groqClean()">✦ AI CLEAN</button>
+        <button class="tool-btn"    onclick="silentSave()">💾 SAVE</button>
+        <button class="tool-btn"    onclick="clearNotes()">✕ CLEAR</button>
+      </div>
+      <div id="groq-log"></div>
+      <div class="key-wrap">
+        <div class="sec-label" style="font-size:8px">Groq API Key</div>
+        <input type="password" id="groq-key" placeholder="gsk_…" oninput="saveKey()">
+      </div>
+    </div>
+  </div>
+
+  <div id="sys-footer">
+    <button class="sys-btn" onclick="exportState()">↑ Export</button>
+    <button class="sys-btn" onclick="document.getElementById('import-input').click()">↓ Import</button>
+    <button class="sys-btn" onclick="dlSW()">↻ SW</button>
+    <button class="sys-btn" onclick="resetAll()">⚠ Reset</button>
+    <input type="file" id="import-input" accept=".json" onchange="importState(event)">
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div id="main">
+
+  <!-- HOME -->
+  <div class="main-view active" id="v-home">
+    <h1>LAZ&nbsp;LAB</h1>
+    <p>Neural Command Hub &mdash; v16 Stable</p>
+  </div>
+
+  <!-- DEBUG -->
+  <div class="main-view" id="v-debug">
+    <div class="debug-viewport">
+      <div class="debug-toolbar">
+        <span class="dbg-title" id="dbg-app-title">NO SESSION</span>
+        <span class="dbg-ch-tag" id="dbg-ch-tag" style="display:none"></span>
+        <span class="dbg-pill idle" id="dbg-pill">IDLE</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <div class="frame-ph" id="frame-ph">
+          <p>Select a slot → set debug target → Launch Session</p>
+        </div>
+        <iframe id="debug-frame" style="display:none;flex:1;border:none;width:100%"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+      </div>
+    </div>
+    <div class="event-feed">
+      <div class="feed-header">
+        <span class="feed-title">⬡ Live Feed</span>
+        <button class="feed-snap-btn" onclick="saveSnapshot()">◈ Snapshot</button>
+        <button class="feed-clear"    onclick="clearFeed()">Clear</button>
+      </div>
+      <div id="event-list">
+        <div class="feed-empty" id="feed-empty">Awaiting session…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="main-view" id="v-portfolio">
+    <div class="port-header">
+      <div><h2>Project Portfolio</h2><div class="sub">Advanced Developer Suite — Neural Build Registry</div></div>
+      <div class="port-actions">
+        <button class="port-btn png" onclick="exportPNG()">Export PNG</button>
+        <button class="port-btn export" onclick="exportPDF()">Export PDF</button>
+      </div>
+    </div>
+    <div id="port-grid"></div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ════════════════════════════════════════════════
+//  CONSTANTS
+// ════════════════════════════════════════════════
+const LS_APPS  = 'llv16_apps';
+const LS_NOTES = 'llv16_notes';
+const LS_KEY   = 'llv16_gkey';
+const LS_SNAPS = 'llv16_snaps';
+const LS_DTGT  = 'llv16_dtgt';
+const LS_DCH   = 'llv16_dch';
+const APP_VER  = 'v16-stable';
+
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+let apps      = [];
+let snapshots = [];
+let gKey      = '';
+let debugId   = null;   // slot id currently targeted
+let debugCh   = 'stable'; // 'stable' or 'test'
+let blobUrls  = [];
+let evStats   = {err:0, wrn:0, net:0, clk:0};
+let errorFP   = {};     // fingerprint map: msgKey -> count
+let eventLog  = [];     // full in-memory log for current session
+
+// ════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════
+function boot() {
+    try {
+        const raw = JSON.parse(localStorage.getItem(LS_APPS) || '[]');
+        // Restore apps — channels from localStorage won't have zipData (stripped on save)
+        // Mark them so launchDebug knows to prompt for re-upload
+        apps = raw.map(a => {
+            if (a.stable && !a.stable.zipData) a.stable.needsReload = true;
+            if (a.test   && !a.test.zipData)   a.test.needsReload   = true;
+            return a;
+        });
+    } catch { apps = []; }
+    try { snapshots = JSON.parse(localStorage.getItem(LS_SNAPS) || '[]'); } catch { snapshots = []; }
+    document.getElementById('project-notes').value = localStorage.getItem(LS_NOTES) || '';
+    gKey    = localStorage.getItem(LS_KEY)  || '';
+    debugId = parseInt(localStorage.getItem(LS_DTGT)) || null;
+    debugCh = localStorage.getItem(LS_DCH) || 'stable';
+    if (gKey) document.getElementById('groq-key').value = gKey;
+    renderSlots();
+    renderSnaps();
+    updateDebugSidebar();
+    window.addEventListener('message', onProbeMsg);
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+function silentSave() {
+    try {
+        // Strip zipData before writing to localStorage — zip bytes are large
+        // and will blow the 5-10MB quota. Metadata, icons, and notes are fine.
+        // zipData is kept in the in-memory `apps` array and in the JSON export file.
+        const stripped = apps.map(a => {
+            const out = { ...a };
+            if (out.stable) out.stable = { ...out.stable, zipData: null };
+            if (out.test)   out.test   = { ...out.test,   zipData: null };
+            return out;
+        });
+        localStorage.setItem(LS_APPS,  JSON.stringify(stripped));
+        localStorage.setItem(LS_NOTES, document.getElementById('project-notes').value);
+    } catch(e) {
+        // Quota exceeded — clear old data and try with just metadata (no icons)
+        try {
+            const minimal = apps.map(a => ({
+                id:a.id, name:a.name, version:a.version, focus:a.focus,
+                desc:a.desc, tags:a.tags, notes:a.notes, loaded:a.loaded,
+                stable: a.stable ? { file:a.stable.file, name:a.stable.name, version:a.stable.version } : null,
+                test:   a.test   ? { file:a.test.file,   name:a.test.name,   version:a.test.version   } : null,
+            }));
+            localStorage.setItem(LS_APPS, JSON.stringify(minimal));
+        } catch(_) { /* truly out of space — in-memory only, user should export */ }
+    }
+}
+function saveKey() {
+    gKey = document.getElementById('groq-key').value.trim();
+    localStorage.setItem(LS_KEY, gKey);
+}
+function saveSnaps() { localStorage.setItem(LS_SNAPS, JSON.stringify(snapshots)); }
+function resetAll() {
+    if (!confirm('Reset all slots, snapshots and notes?')) return;
+    apps = []; snapshots = []; debugId = null;
+    silentSave(); saveSnaps();
+    renderSlots(); renderSnaps(); updateDebugSidebar();
+}
+
+// ════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════
+function sbTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sb-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('stab-' + name).classList.add('active');
+    document.getElementById('sp-'   + name).classList.add('active');
+}
+function mainTab(name) {
+    document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
+    document.getElementById('v-' + name).classList.add('active');
+    if (name === 'portfolio') renderPortfolio();
+    if (name === 'debug')     sbTab('debug');
+}
+
+// ════════════════════════════════════════════════
+//  SLOTS
+// ════════════════════════════════════════════════
+function createSlot() {
+    apps.push({
+        id: Date.now(), name:'New Build', version:'1.0',
+        focus:'Core Logic', desc:'Upload a .zip to populate.',
+        tags:['PWA'], iconData:null,
+        stable:null,  // { zipData, file, name, version, desc, focus, tags, iconData }
+        test:null,
+        notes:'',
+        loaded: false
+    });
+    silentSave(); renderSlots();
+}
+
+function deleteSlot(id) {
+    if (debugId === id) stopDebug();
+    apps = apps.filter(a => a.id !== id);
+    silentSave(); renderSlots(); updateDebugSidebar();
+}
+
+function setDebugTarget(id, ch) {
+    debugId = id; debugCh = ch;
+    localStorage.setItem(LS_DTGT, id);
+    localStorage.setItem(LS_DCH,  ch);
+    updateDebugSidebar(); renderSlots();
+    sbTab('debug'); mainTab('debug');
+}
+
+// Promote test → stable
+function promoteTest(id) {
+    const app = apps.find(a => a.id === id);
+    if (!app || !app.test) return;
+    if (!confirm('Promote TEST build to STABLE? Current stable will be replaced.')) return;
+    app.stable = { ...app.test };
+    // Update top-level display fields from the promoted build
+    app.name    = app.stable.name    || app.name;
+    app.version = app.stable.version || app.version;
+    app.desc    = app.stable.desc    || app.desc;
+    app.focus   = app.stable.focus   || app.focus;
+    app.tags    = app.stable.tags    || app.tags;
+    app.iconData = app.stable.iconData || app.iconData;
+    silentSave(); renderSlots();
+    updateDebugSidebar();
+}
+
+function saveSlotNotes(id) {
+    const app = apps.find(a => a.id === id);
+    if (!app) return;
+    const ta = document.getElementById('sn-' + id);
+    if (ta) app.notes = ta.value;
+    silentSave();
+    const btn = document.querySelector(`[data-save-notes="${id}"]`);
+    if (btn) { btn.textContent = '✓ Saved'; setTimeout(() => btn.textContent = 'Save', 1200); }
+}
+
+function renderSlots() {
+    const el = document.getElementById('app-list');
+    if (!apps.length) {
+        el.innerHTML = '<div class="no-slots">NO SLOTS — ADD ONE ABOVE</div>';
+        return;
+    }
+    el.innerHTML = apps.map(a => {
+        const isDbg     = debugId === a.id;
+        const hasStable = !!a.stable;
+        const hasTest   = !!a.test;
+        const stableFile = hasStable ? (a.stable.needsReload ? '↻ ' + a.stable.file : a.stable.file) : '— empty';
+        const testFile   = hasTest   ? (a.test.needsReload   ? '↻ ' + a.test.file   : a.test.file)   : '— empty';
+
+        return `
+        <div class="slot${hasStable?' has-stable':''}${isDbg?' debugging':''}">
+          <button class="slot-del" onclick="deleteSlot(${a.id})">✕</button>
+          <div class="slot-top">
+            <span class="slot-name">${x(a.name)}</span>
+            <span class="slot-ver">v${x(a.version)}</span>
+          </div>
+          <div class="slot-focus">${x(a.focus)}</div>
+          <div class="slot-desc">${x(a.desc)}</div>
+
+          <!-- CHANNELS -->
+          <div class="channels">
+            <!-- STABLE -->
+            <div class="channel-row${hasStable?' has-zip':''}">
+              <span class="ch-badge stable">STABLE</span>
+              <span class="ch-file${hasStable?' loaded':''}">${x(stableFile)}</span>
+              <div class="ch-actions">
+                <label class="ch-btn pick-label" style="padding:3px 7px;border-radius:4px;font-size:8px;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--dim);letter-spacing:1px;text-transform:uppercase;display:inline-block">
+                  ${hasStable?'↑':'⬆'}
+                  <input type="file" accept=".zip" onchange="ingestZip(event,${a.id},'stable')">
+                </label>
+                ${hasStable?`<button class="ch-btn launch" onclick="setDebugTarget(${a.id},'stable')">▶</button>`:''}
+              </div>
+            </div>
+            <!-- TEST -->
+            <div class="channel-row${hasTest?' has-zip':''}">
+              <span class="ch-badge test">TEST</span>
+              <span class="ch-file${hasTest?' loaded':''}">${x(testFile)}</span>
+              <div class="ch-actions">
+                <label class="ch-btn pick-label" style="padding:3px 7px;border-radius:4px;font-size:8px;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--dim);letter-spacing:1px;text-transform:uppercase;display:inline-block">
+                  ${hasTest?'↑':'⬆'}
+                  <input type="file" accept=".zip" onchange="ingestZip(event,${a.id},'test')">
+                </label>
+                ${hasTest?`<button class="ch-btn launch" onclick="setDebugTarget(${a.id},'test')">▶</button>`:''}
+                ${hasTest?`<button class="ch-btn promote" onclick="promoteTest(${a.id})" title="Promote test to stable">⬆ Stable</button>`:''}
+              </div>
+            </div>
+          </div>
+
+          <!-- SLOT NOTES -->
+          <div class="slot-notes-wrap">
+            <textarea class="slot-notes" id="sn-${a.id}"
+              placeholder="Session notes, observations, known issues…"
+              >${x(a.notes||'')}</textarea>
+            <div class="slot-notes-footer">
+              <span class="slot-notes-hint">NOTES — persisted per slot</span>
+              <button class="slot-notes-save" data-save-notes="${a.id}" onclick="saveSlotNotes(${a.id})">Save</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+}
+
+// ════════════════════════════════════════════════
+//  ZIP INGESTION
+// ════════════════════════════════════════════════
+async function ingestZip(e, id, channel) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (typeof JSZip === 'undefined') {
+        alert('JSZip is still loading — wait a moment and try again.');
+        return;
+    }
+
+    // READ THE FILE BYTES IMMEDIATELY — before any await, DOM change, or
+    // sidebar log that could re-render the input element and drop the reference.
+    const ab = await file.arrayBuffer();
+
+    const app = apps.find(a => a.id === id);
+    if (!app) return;
+
+    // Now safe to log and touch DOM
+    rlog('INGESTING [' + channel.toUpperCase() + ']: ' + file.name, 'ai');
+
+    try {
+        // Safe chunked base64 encode — direct spread crashes on large files
+        const bytes = new Uint8Array(ab);
+        let b64 = '';
+        const CHUNK = 8192;
+        for (let i = 0; i < bytes.length; i += CHUNK) {
+            b64 += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+        }
+        b64 = btoa(b64);
+
+        const zip = await JSZip.loadAsync(ab);
+
+        const ch = { zipData:b64, file:file.name, name:app.name, version:app.version,
+                     desc:app.desc, focus:app.focus, tags:app.tags, iconData:null };
+
+        // manifest
+        let mEntry=null, mDepth=99;
+        zip.forEach((p,ent) => { if(!ent.dir && p.endsWith('manifest.json')){ const d=p.split('/').length; if(d<mDepth){mEntry=ent;mDepth=d;} } });
+        if (mEntry) {
+            const m = JSON.parse(await mEntry.async('string'));
+            ch.name    = m.name || m.short_name || ch.name;
+            ch.version = m.version || ch.version;
+            ch.desc    = m.description || ch.desc;
+            ch.focus   = (m.description||ch.focus).substring(0,40);
+            ch.tags    = m.categories?.length ? m.categories.map(c=>c.toUpperCase()).slice(0,5) : ['PWA','DEPLOYED'];
+            rlog('MANIFEST: ' + ch.name + ' v' + ch.version, 'ok');
+        } else {
+            ch.name = file.name.replace('.zip','');
+            rlog('NO MANIFEST — using filename', 'err');
+        }
+
+        // README fallback
+        let rEntry=null;
+        zip.forEach((p,ent) => { if(!ent.dir&&/readme/i.test(p)&&/\.(md|txt)$/i.test(p)&&!rEntry) rEntry=ent; });
+        if (rEntry) {
+            const txt=await rEntry.async('string');
+            const para=txt.split(/\n\s*\n/).find(p=>p.trim()&&!p.trim().startsWith('#'));
+            if(para&&!mEntry) ch.desc=para.replace(/[#*`]/g,'').trim().slice(0,160);
+            const vm=txt.match(/v(?:ersion\s*)?(\d+\.\d+)/i);
+            if(vm&&ch.version==='1.0') ch.version=vm[1];
+            rlog('README PARSED','ok');
+        }
+
+        // Icon
+        let iEntry=null,iPri=99;
+        zip.forEach((p,ent) => {
+            if(ent.dir)return; const lo=p.toLowerCase();
+            if(/icon.*512.*\.png/.test(lo)&&iPri>0){iEntry=ent;iPri=0;}
+            else if(/icon.*192.*\.png/.test(lo)&&iPri>1){iEntry=ent;iPri=1;}
+            else if(/icon.*256.*\.png/.test(lo)&&iPri>2){iEntry=ent;iPri=2;}
+            else if(/icon.*\.png/.test(lo)&&iPri>3){iEntry=ent;iPri=3;}
+            else if(/logo.*\.png/.test(lo)&&iPri>4){iEntry=ent;iPri=4;}
+        });
+        if(iEntry){ ch.iconData=await toDataURL(await iEntry.async('blob')); rlog('ICON EXTRACTED','ok'); }
+
+        app[channel] = ch;
+        // Update top-level display from whichever channel was just loaded
+        // (stable always takes precedence for display; test just shows in slot)
+        if (channel === 'stable' || !app.stable) {
+            app.name=ch.name; app.version=ch.version; app.desc=ch.desc;
+            app.focus=ch.focus; app.tags=ch.tags; app.iconData=ch.iconData;
+        }
+        app.loaded = true;
+
+        silentSave(); renderSlots();
+        rlog('SLOT [' + channel.toUpperCase() + '] POPULATED ✓','ok');
+    } catch(err) { rlog('INGEST ERROR: '+err.message,'err'); }
+}
+
+function toDataURL(blob) {
+    return new Promise((res,rej) => { const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(blob); });
+}
+
+// ════════════════════════════════════════════════
+//  DEBUG ENGINE
+// ════════════════════════════════════════════════
+const PROBE = `(function(){
+  var _c={log:console.log.bind(console),warn:console.warn.bind(console),error:console.error.bind(console),info:console.info.bind(console)};
+  function send(t,m,e){try{window.parent.postMessage({__lazlab:true,type:t,msg:String(m).slice(0,600),extra:e||null,ts:new Date().toISOString()},'*');}catch(ex){}}
+  console.log  =function(){send('log',  Array.from(arguments).join(' '));_c.log.apply(console,arguments);};
+  console.warn =function(){send('warn', Array.from(arguments).join(' '));_c.warn.apply(console,arguments);};
+  console.error=function(){send('error',Array.from(arguments).join(' '));_c.error.apply(console,arguments);};
+  console.info =function(){send('info', Array.from(arguments).join(' '));_c.info.apply(console,arguments);};
+  window.onerror=function(m,s,l,c,e){send('error',m,{src:s,line:l,col:c,stack:e?e.stack:null});return false;};
+  window.addEventListener('unhandledrejection',function(e){send('error','Unhandled Promise: '+(e.reason?(e.reason.message||e.reason):'unknown'));});
+  document.addEventListener('click',function(e){
+    var t=e.target,d=t.tagName.toLowerCase();
+    if(t.id)d+='#'+t.id;
+    if(t.className&&typeof t.className==='string')d+='.'+t.className.trim().split(/\\s+/).join('.');
+    var tx=(t.innerText||t.value||'').trim().slice(0,60);
+    send('click',d+(tx?' "'+tx+'"':''));
+  },true);
+  var _f=window.fetch;
+  if(_f){window.fetch=function(inp,init){
+    var u=typeof inp==='string'?inp:(inp.url||String(inp)),m=(init&&init.method)?init.method.toUpperCase():'GET',t0=Date.now();
+    send('net',m+' '+u.slice(0,120));
+    return _f.apply(window,arguments).then(function(r){send('net',m+' '+r.status+' '+u.slice(0,100)+' ('+(Date.now()-t0)+'ms)');return r;})
+    .catch(function(e){send('error','FETCH FAIL: '+u.slice(0,80)+' — '+e.message);throw e;});
+  };}
+  var _X=window.XMLHttpRequest;
+  if(_X){var OX=_X;window.XMLHttpRequest=function(){
+    var xhr=new OX(),method,url,t0;
+    var _o=xhr.open.bind(xhr);
+    xhr.open=function(m,u){method=m.toUpperCase();url=u;return _o.apply(xhr,arguments);};
+    xhr.addEventListener('loadstart',function(){t0=Date.now();send('net',method+' '+String(url).slice(0,120));});
+    xhr.addEventListener('load',function(){send('net',method+' '+xhr.status+' '+String(url).slice(0,100)+' ('+(Date.now()-t0)+'ms)');});
+    xhr.addEventListener('error',function(){send('error','XHR FAIL: '+String(url).slice(0,100));});
+    return xhr;
+  };}
+  send('info','LAZ LAB Neural Probe v16 active');
+})();`;
+
+async function launchDebug() {
+    if (!debugId) { alert('Set a debug target first — use ▶ on any slot channel.'); return; }
+    const app = apps.find(a => a.id === debugId);
+    if (!app) { alert('Slot not found.'); return; }
+    const ch = app[debugCh];
+    if (!ch || !ch.zipData) {
+        const msg = ch?.needsReload
+            ? `"${ch.file || 'this build'}" was loaded in a previous session but zip data isn\'t kept between sessions.\n\nRe-upload the zip on the ${debugCh.toUpperCase()} channel to launch.`
+            : `No zip loaded on the ${debugCh.toUpperCase()} channel. Upload a build first.`;
+        alert(msg);
+        return;
+    }
+
+    stopDebug(); resetStats(); clearFeed();
+    setPill('loading','LOADING');
+    document.getElementById('dbg-app-title').textContent = (ch.name || app.name).toUpperCase();
+    const chTag = document.getElementById('dbg-ch-tag');
+    chTag.className = 'dbg-ch-tag ' + debugCh;
+    chTag.textContent = debugCh.toUpperCase();
+    chTag.style.display = '';
+
+    try {
+        const bin  = atob(ch.zipData);
+        const buf  = new Uint8Array(bin.length);
+        for (let i=0;i<bin.length;i++) buf[i]=bin.charCodeAt(i);
+
+        const zip  = await JSZip.loadAsync(buf.buffer);
+        const fmap = {};
+
+        await Promise.all(
+            Object.values(zip.files)
+                .filter(e => !e.dir)
+                .map(async e => {
+                    const blob = await e.async('blob');
+                    const url  = URL.createObjectURL(blob);
+                    blobUrls.push(url);
+                    const parts = e.name.split('/');
+                    const norm  = parts.length > 1 ? parts.slice(1).join('/') : e.name;
+                    fmap[norm]   = url;
+                    fmap[e.name] = url;
+                })
+        );
+
+        // Find HTML entry
+        let htmlPath = null;
+        for (const c of ['index.html','index.htm','app.html','main.html']) {
+            if (fmap[c]) { htmlPath=c; break; }
+        }
+        if (!htmlPath) {
+            for (const k of Object.keys(fmap)) { if(/\.html?$/i.test(k)){htmlPath=k;break;} }
+        }
+        if (!htmlPath) { setPill('err','NO HTML'); feedEv('error','No HTML entry point found'); return; }
+
+        let html = await (await fetch(fmap[htmlPath])).text();
+        html     = rewriteAssets(html, fmap);
+        const probe = `<script>/* LAZ LAB PROBE */${PROBE}<\/script>`;
+        html = /<head[^>]*>/i.test(html)
+            ? html.replace(/(<head[^>]*>)/i, '$1\n'+probe)
+            : probe+html;
+
+        const frame = document.getElementById('debug-frame');
+        document.getElementById('frame-ph').style.display = 'none';
+        frame.style.display = 'block';
+        frame.srcdoc = html;
+        setPill('live','LIVE');
+        feedEv('info', 'Session started — ' + (ch.name||app.name) + ' v' + (ch.version||app.version) + ' [' + debugCh.toUpperCase() + ']');
+        feedEv('info', 'Entry: ' + htmlPath + ' | Files: ' + Object.keys(fmap).length);
+    } catch(err) {
+        setPill('err','ERROR');
+        feedEv('error','Launch failed: '+err.message);
+    }
+}
+
+function rewriteAssets(html, fmap) {
+    return html.replace(/\b(src|href|action)\s*=\s*["']([^"'#?]+)["']/gi, (match,attr,path) => {
+        if (/^(data:|https?:|\/\/|#|javascript:)/i.test(path)) return match;
+        const norm = path.replace(/^\.\//,'');
+        return fmap[norm] ? `${attr}="${fmap[norm]}"` : match;
+    });
+}
+
+function stopDebug() {
+    const frame = document.getElementById('debug-frame');
+    frame.srcdoc=''; frame.style.display='none';
+    document.getElementById('frame-ph').style.display='flex';
+    const tag = document.getElementById('dbg-ch-tag');
+    tag.style.display='none';
+    blobUrls.forEach(u=>URL.revokeObjectURL(u)); blobUrls=[];
+    setPill('idle','IDLE');
+    document.getElementById('dbg-app-title').textContent='NO SESSION';
+    feedEv('info','Session stopped');
+}
+
+// ════════════════════════════════════════════════
+//  PROBE MESSAGES
+// ════════════════════════════════════════════════
+function onProbeMsg(e) {
+    const d = e.data;
+    if (!d || !d.__lazlab) return;
+    feedEv(d.type, d.msg, d.ts, d.extra);
+
+    if      (d.type==='error') { evStats.err++; updateStat('stat-err',evStats.err); fingerprintError(d.msg); }
+    else if (d.type==='warn')  { evStats.wrn++; updateStat('stat-wrn',evStats.wrn); }
+    else if (d.type==='net')   { evStats.net++; updateStat('stat-net',evStats.net); }
+    else if (d.type==='click') { evStats.clk++; updateStat('stat-clk',evStats.clk); }
+}
+
+// ════════════════════════════════════════════════
+//  ERROR FINGERPRINTING
+// ════════════════════════════════════════════════
+function fingerprintError(msg) {
+    // Normalise: strip line numbers and dynamic values to get a stable key
+    const key = msg
+        .replace(/\d+/g, 'N')          // numbers → N
+        .replace(/["'][^"']{0,60}["']/g, '"…"') // string literals
+        .slice(0, 120);
+    errorFP[key] = (errorFP[key] || 0) + 1;
+    renderFingerprints();
+}
+
+function renderFingerprints() {
+    const el = document.getElementById('fp-list');
+    const entries = Object.entries(errorFP).sort((a,b)=>b[1]-a[1]);
+    if (!entries.length) { el.innerHTML='<div class="fp-empty">No errors yet</div>'; return; }
+    el.innerHTML = entries.slice(0,8).map(([k,v]) =>
+        `<div class="fp-row">
+          <span class="fp-count">${v}×</span>
+          <span class="fp-msg" title="${x(k)}">${x(k)}</span>
+        </div>`
+    ).join('');
+}
+
+// ════════════════════════════════════════════════
+//  EVENT FEED
+// ════════════════════════════════════════════════
+function feedEv(type, msg, ts, extra) {
+    // Add to in-memory log
+    eventLog.push({ type, msg, ts: ts || new Date().toISOString(), extra: extra||null });
+
+    const list = document.getElementById('event-list');
+    const emp  = document.getElementById('feed-empty');
+    if (emp) emp.remove();
+
+    const time = new Date(ts||Date.now()).toLocaleTimeString('en-US',
+        {hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+    // Dupe detection: check if last event same type+msg
+    const lastEv = list.lastElementChild;
+    if (lastEv && !lastEv.classList.contains('feed-empty')) {
+        const lastMsg = lastEv.dataset.msg;
+        const lastType = lastEv.dataset.type;
+        if (lastMsg === msg && lastType === type) {
+            // Increment existing badge instead of adding new row
+            let badge = lastEv.querySelector('.ev-dupe-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'ev-dupe-badge';
+                lastEv.appendChild(badge);
+                lastEv.classList.add('dupe');
+                badge._count = 1;
+            }
+            badge._count++;
+            badge.textContent = '×' + badge._count;
+            return;
+        }
+    }
+
+    const ev = document.createElement('div');
+    ev.className     = 'ev ' + (type||'log');
+    ev.dataset.msg   = msg;
+    ev.dataset.type  = type;
+    ev.dataset.flagged = '0';
+    ev.innerHTML = `<span class="ev-ts">${time}</span><span class="ev-type">${x(type||'log')}</span>${x(msg||'')}` +
+        `<button class="ev-flag-btn" onclick="toggleFlag(this)" title="Flag for triage">⚑</button>`;
+    list.appendChild(ev);
+
+    while (list.children.length > 600) list.removeChild(list.firstChild);
+    list.scrollTop = list.scrollHeight;
+}
+
+function toggleFlag(btn) {
+    const ev = btn.closest('.ev');
+    const on = ev.dataset.flagged === '1';
+    ev.dataset.flagged = on ? '0' : '1';
+    ev.classList.toggle('flagged', !on);
+    btn.classList.toggle('on', !on);
+}
+
+function clearFeed() {
+    document.getElementById('event-list').innerHTML =
+        '<div class="feed-empty" id="feed-empty">Awaiting session…</div>';
+    resetStats();
+    errorFP  = {};
+    eventLog = [];
+    renderFingerprints();
+}
+
+function resetStats() {
+    evStats = {err:0,wrn:0,net:0,clk:0};
+    ['stat-err','stat-wrn','stat-net','stat-clk'].forEach(id => updateStat(id,0));
+}
+function updateStat(id,v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+function setPill(cls,lbl) {
+    const p=document.getElementById('dbg-pill');
+    p.className='dbg-pill '+cls; p.textContent=lbl;
+}
+function updateDebugSidebar() {
+    const nm = document.getElementById('dbg-target-name');
+    const ch = document.getElementById('dbg-target-ch');
+    if (!debugId) {
+        nm.innerHTML='<span class="dsb-none">— None selected —</span>';
+        ch.innerHTML=''; return;
+    }
+    const app = apps.find(a=>a.id===debugId);
+    if (!app) { debugId=null; nm.innerHTML='<span class="dsb-none">— None selected —</span>'; ch.innerHTML=''; return; }
+    nm.innerHTML = `<span class="dsb-name">${x(app.name)}</span>`;
+    ch.innerHTML = `<span class="dsb-channel">Channel: ${debugCh.toUpperCase()}</span>`;
+}
+
+// ════════════════════════════════════════════════
+//  SESSION SNAPSHOTS
+// ════════════════════════════════════════════════
+function saveSnapshot() {
+    if (!eventLog.length) { alert('No events to snapshot yet.'); return; }
+    const app = apps.find(a=>a.id===debugId);
+    const snap = {
+        id:       Date.now(),
+        ts:       new Date().toISOString(),
+        appName:  app ? app.name : 'Unknown',
+        channel:  debugCh,
+        stats:    { ...evStats },
+        errors:   Object.entries(errorFP).sort((a,b)=>b[1]-a[1]).slice(0,20),
+        log:      eventLog.slice(-300).map(e => `[${e.ts.slice(11,19)}] ${e.type.toUpperCase()} ${e.msg}`).join('\n'),
+        notes:    app ? (app.notes||'') : ''
+    };
+    snapshots.unshift(snap);
+    if (snapshots.length > 20) snapshots = snapshots.slice(0,20); // keep last 20
+    saveSnaps(); renderSnaps();
+    // Visual feedback
+    const btn = document.querySelector('.feed-snap-btn');
+    if (btn) { btn.textContent='✓ Saved'; setTimeout(()=>btn.textContent='◈ Snapshot',1400); }
+}
+
+function renderSnaps() {
+    const el = document.getElementById('snap-list');
+    if (!snapshots.length) {
+        el.innerHTML = '<div class="fp-empty" style="padding:20px 0">No snapshots yet — run a session and hit ◈ Snapshot</div>';
+        return;
+    }
+    el.innerHTML = snapshots.map(s => `
+        <div class="snap-row" onclick="viewSnap('${s.id}')">
+          <div style="flex:1">
+            <div class="snap-app">${x(s.appName)} <span style="color:var(--warn);font-size:8px">[${x(s.channel)}]</span></div>
+            <div class="snap-ts">${new Date(s.ts).toLocaleString()} <span class="snap-counts">${s.stats.err}err ${s.stats.wrn}wrn ${s.stats.net}net</span></div>
+          </div>
+          <button class="snap-del" onclick="event.stopPropagation();deleteSnap('${s.id}')">✕</button>
+        </div>`).join('');
+}
+
+function viewSnap(id) {
+    const s = snapshots.find(s=>String(s.id)===String(id));
+    if (!s) return;
+    const sv = document.getElementById('snap-view');
+    document.getElementById('snap-detail-meta').textContent =
+        `App: ${s.appName} [${s.channel.toUpperCase()}]\nDate: ${new Date(s.ts).toLocaleString()}\nErrors: ${s.stats.err}  Warns: ${s.stats.wrn}  Network: ${s.stats.net}  Clicks: ${s.stats.clk}`;
+    document.getElementById('snap-detail-log').textContent = s.log;
+    sv.style.display = 'block';
+}
+function closeSnapView() { document.getElementById('snap-view').style.display='none'; }
+function deleteSnap(id) {
+    snapshots = snapshots.filter(s=>String(s.id)!==String(id));
+    saveSnaps(); renderSnaps();
+    closeSnapView();
+}
+
+// ════════════════════════════════════════════════
+//  GROQ TRIAGE  (manual: record → review → fire)
+// ════════════════════════════════════════════════
+async function groqTriage() {
+    const key = document.getElementById('groq-key').value.trim() || gKey;
+    if (!key) { alert('Add your Groq API key in the PLAN tab first.'); return; }
+    if (!eventLog.length) { alert('No events recorded yet — run a session first.'); return; }
+
+    // Collect flagged events first, fall back to last 100
+    const list  = document.getElementById('event-list');
+    const flagged = Array.from(list.querySelectorAll('.ev.flagged'))
+        .map(el => el.dataset.type.toUpperCase() + ': ' + el.dataset.msg);
+    const recent  = eventLog.slice(-100)
+        .map(e => `[${e.ts.slice(11,19)}] ${e.type.toUpperCase()} ${e.msg}`);
+
+    const app    = apps.find(a=>a.id===debugId);
+    const appCtx = app
+        ? `App: ${app.name} v${app.version} [${debugCh.toUpperCase()} channel]. Focus: ${app.focus}.\nSlot notes: ${app.notes||'none'}.`
+        : 'Unknown app.';
+
+    const errSummary = Object.entries(errorFP).sort((a,b)=>b[1]-a[1]).slice(0,10)
+        .map(([k,v])=>`  ${v}× ${k}`).join('\n');
+
+    const prompt = `${appCtx}
+
+UNIQUE ERROR FINGERPRINTS (most frequent first):
+${errSummary || 'None'}
+
+${flagged.length ? 'FLAGGED EVENTS (developer-marked):\n' + flagged.join('\n') + '\n' : ''}
+FULL EVENT LOG (last 100):
+${recent.join('\n')}`;
+
+    const out = document.getElementById('triage-out');
+    out.textContent = '◈ Analysing with Groq…';
+    out.classList.add('open');
+
+    try {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+            body:JSON.stringify({
+                model:'llama-3.3-70b-versatile', max_tokens:1400, temperature:0.25,
+                messages:[
+                    {role:'system', content:`You are an expert PWA debugger and JavaScript engineer.
+Analyse this live session log from a running web app captured by an instrumentation probe.
+The log contains console output, network calls, click interactions, and errors.
+
+Provide:
+1. ONE-LINE SUMMARY of what the app appears to be doing / what went wrong
+2. ROOT CAUSES — for each unique error, state the most likely cause
+3. CLICK PATH — reconstruct what the user did that led to the failures
+4. NETWORK ISSUES — any failed or suspicious calls
+5. FIXES — concrete code fixes, short and specific. If a flagged event exists, address it first.
+
+Be direct. No preamble. Use code blocks for any code snippets.`},
+                    {role:'user', content:prompt}
+                ]
+            })
+        });
+        if (!res.ok) { const e=await res.json(); out.textContent='✗ '+(e.error?.message||res.status); return; }
+        const d = await res.json();
+        out.textContent = d.choices?.[0]?.message?.content || '(no response)';
+    } catch(e) { out.textContent='✗ Network error: '+e.message; }
+}
+
+// ════════════════════════════════════════════════
+//  SEND TO CLAUDE
+// ════════════════════════════════════════════════
+function sendToClaude() {
+    if (!eventLog.length && !Object.keys(errorFP).length) {
+        alert('No session data yet — run a debug session first.'); return;
+    }
+    const app     = apps.find(a=>a.id===debugId);
+    const appName = app ? app.name + ' v' + app.version : 'Unknown app';
+    const ch      = debugCh.toUpperCase();
+
+    const flagged = eventLog
+        .filter((_, i) => {
+            const el = document.querySelector(`#event-list .ev:nth-child(${i+1})`);
+            return el && el.dataset.flagged === '1';
+        });
+
+    const errSummary = Object.entries(errorFP).sort((a,b)=>b[1]-a[1]).slice(0,15)
+        .map(([k,v])=>`  ${v}× ${k}`).join('\n');
+
+    const recentLog = eventLog.slice(-150)
+        .map(e=>`[${e.ts.slice(11,19)}] ${e.type.toUpperCase()} ${e.msg}${e.extra?.stack?'\n  STACK: '+e.extra.stack.slice(0,200):''}`)
+        .join('\n');
+
+    const triageOut = document.getElementById('triage-out').textContent;
+
+    const output = `=== LAZ LAB DEBUG REPORT ===
+App:      ${appName}
+Channel:  ${ch}
+Date:     ${new Date().toLocaleString()}
+Stats:    ${evStats.err} errors  ${evStats.wrn} warnings  ${evStats.net} network  ${evStats.clk} clicks
+
+${app?.notes ? '--- DEVELOPER NOTES ---\n' + app.notes + '\n' : ''}
+--- UNIQUE ERROR FINGERPRINTS ---
+${errSummary || 'None'}
+
+${flagged.length ? '--- FLAGGED EVENTS ---\n' + flagged.map(e=>`[${e.ts.slice(11,19)}] ${e.type.toUpperCase()} ${e.msg}`).join('\n') + '\n' : ''}
+--- EVENT LOG (last 150) ---
+${recentLog}
+
+${triageOut && triageOut !== '◈ Analysing with Groq…'
+    ? '--- GROQ PRE-TRIAGE ---\n' + triageOut
+    : '(Groq triage not run — paste above and ask Claude to diagnose)'}
+=== END REPORT ===`;
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(output).then(() => {
+        const btn = document.querySelector('.send-claude-btn');
+        if (btn) { btn.textContent='✓ Copied — paste into Claude chat'; setTimeout(()=>btn.textContent='⬡ Send to Claude',2500); }
+    }).catch(() => {
+        // Fallback: download as txt
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([output],{type:'text/plain'}));
+        a.download = 'LazLab_Debug_' + Date.now() + '.txt';
+        a.click();
+    });
+}
+
+// ════════════════════════════════════════════════
+//  GROQ ROADMAP CLEAN
+// ════════════════════════════════════════════════
+async function groqClean() {
+    const notes=document.getElementById('project-notes').value.trim();
+    if(!notes){rlog('NO NOTES','err');return;}
+    const key=document.getElementById('groq-key').value.trim()||gKey;
+    if(!key){rlog('ENTER GROQ KEY','err');return;}
+    rlog('SENDING TO GROQ…','ai');
+    try {
+        const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+            method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+            body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:800,temperature:0.4,
+                messages:[
+                    {role:'system',content:`You are a senior developer roadmap architect.
+Transform raw developer notes into a clean structured roadmap.
+Format EXACTLY:
+## MISSION OBJECTIVE
+[one sentence]
+
+## PHASE 1 — [name]
+- [ ] task
+
+## PHASE 2 — [name]
+- [ ] task
+
+Keep it concise and technical.`},
+                    {role:'user',content:notes}
+                ]})
+        });
+        if(!res.ok){const e=await res.json();rlog('GROQ: '+(e.error?.message||res.status),'err');return;}
+        const d=await res.json();
+        document.getElementById('project-notes').value=d.choices?.[0]?.message?.content||'';
+        silentSave(); rlog('ROADMAP STRUCTURED ✓','ok');
+    } catch(e){rlog('NET ERROR: '+e.message,'err');}
+}
+function clearNotes(){document.getElementById('project-notes').value='';silentSave();}
+
+// Roadmap log (separate from event feed)
+function rlog(msg,type='ai'){
+    const el=document.getElementById('groq-log');
+    el.classList.add('open');
+    const d=document.createElement('div');
+    d.className='l-'+type;
+    d.textContent=(type==='ai'?'◈ ':type==='ok'?'✓ ':'✗ ')+msg;
+    el.appendChild(d); el.scrollTop=el.scrollHeight;
+}
+
+// ════════════════════════════════════════════════
+//  PORTFOLIO
+// ════════════════════════════════════════════════
+function renderPortfolio(){
+    const grid=document.getElementById('port-grid');
+    if(!apps.length){grid.innerHTML='<div class="port-empty">NO PROJECTS — ADD SLOTS AND INGEST BUILDS</div>';return;}
+    grid.innerHTML=apps.map((a,i)=>{
+        const icon=a.iconData||'icons/icon-192.png';
+        const tags=(a.tags||['PWA']).map(t=>`<span class="tag">${x(t)}</span>`).join('');
+        return `<div class="card">
+            <div class="card-num">LAZ-${String(i+1).padStart(3,'0')}</div>
+            <div class="card-top">
+                <div class="card-icon-wrap"><img src="${icon}" alt="${x(a.name)}"></div>
+                <div class="card-info">
+                    <div class="card-name">${x(a.name)}</div>
+                    <div class="card-ver">v${x(a.version)}</div>
+                    <div class="card-focus">${x(a.focus)}</div>
+                </div>
+            </div>
+            <div class="card-div"></div>
+            <div class="card-desc">${x(a.desc)}</div>
+            <div class="card-tags">${tags}</div>
+            <div class="card-foot">
+                <div><span class="status-dot"></span><span class="status-txt">${a.loaded?'Build Active':'Slot Pending'}</span></div>
+                <span class="card-brand">LAZ LAB ⬡</span>
+            </div>
+        </div>`;
+    }).join('');
+}
+function exportPNG(){
+    renderPortfolio();
+    html2canvas(document.getElementById('port-grid'),{backgroundColor:'#040406',scale:2,useCORS:true,allowTaint:true})
+        .then(c=>{const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='LazLab_Portfolio_'+new Date().toISOString().slice(0,10)+'.png';a.click();});
+}
+
+async function exportPDF() {
+    if (!apps.length) { alert('No projects to export.'); return; }
+    renderPortfolio();
+
+    const btn = document.querySelector('.port-btn.export');
+    if (btn) { btn.textContent = 'Building PDF…'; btn.disabled = true; }
+
+    try {
+        const { jsPDF } = window.jspdf;
+        // A4 landscape for a marketing feel
+        const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+        const PW = 297, PH = 210; // A4 landscape mm
+
+        // ── Load the LAZ LAB icon as base64 ──
+        let iconB64 = null;
+        try {
+            const resp = await fetch('icons/icon-512.png');
+            if (resp.ok) {
+                const blob = await resp.blob();
+                iconB64 = await toDataURL(blob);
+            }
+        } catch(_) { /* icon optional — PDF still exports without it */ }
+
+        // ── COVER PAGE ──
+        // Dark background
+        pdf.setFillColor(4, 4, 6);
+        pdf.rect(0, 0, PW, PH, 'F');
+
+        // Purple accent bar — left edge
+        pdf.setFillColor(188, 19, 254);
+        pdf.rect(0, 0, 3, PH, 'F');
+
+        // Subtle top rule
+        pdf.setDrawColor(30, 30, 46);
+        pdf.setLineWidth(0.3);
+        pdf.line(3, 28, PW - 12, 28);
+
+        // LAZ LAB icon
+        if (iconB64) {
+            // Glowing rounded square — draw a purple-tinted rect behind icon
+            pdf.setFillColor(20, 10, 30);
+            pdf.roundedRect(16, 38, 56, 56, 8, 8, 'F');
+            pdf.setDrawColor(188, 19, 254);
+            pdf.setLineWidth(0.5);
+            pdf.roundedRect(16, 38, 56, 56, 8, 8, 'S');
+            pdf.addImage(iconB64, 'PNG', 18, 40, 52, 52);
+        }
+
+        // LAZ LAB wordmark
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(38);
+        pdf.setTextColor(255, 255, 255);
+        pdf.text('LAZ LAB', iconB64 ? 82 : 16, 62);
+
+        // Tagline
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(11);
+        pdf.setTextColor(94, 241, 255);
+        pdf.text('NEURAL COMMAND HUB  —  ADVANCED DEVELOPER SUITE', iconB64 ? 82 : 16, 74);
+
+        // Divider under wordmark
+        pdf.setDrawColor(188, 19, 254);
+        pdf.setLineWidth(0.4);
+        pdf.line(iconB64 ? 82 : 16, 80, PW - 12, 80);
+
+        // Stats line
+        const activeBuilds = apps.filter(a => a.loaded).length;
+        const stableCount  = apps.filter(a => a.stable).length;
+        const testCount    = apps.filter(a => a.test).length;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.setTextColor(90, 90, 122);
+        const statsLine = `${apps.length} REGISTERED PROJECTS  ·  ${activeBuilds} ACTIVE BUILDS  ·  ${stableCount} STABLE CHANNELS  ·  ${testCount} TEST CHANNELS`;
+        pdf.text(statsLine, iconB64 ? 82 : 16, 90);
+
+        // Project names list as a quick index
+        pdf.setFontSize(8);
+        pdf.setTextColor(60, 60, 90);
+        const names = apps.map((a,i) => `${String(i+1).padStart(2,'0')}  ${a.name}  v${a.version}`);
+        const col1  = names.slice(0, Math.ceil(names.length/2));
+        const col2  = names.slice(Math.ceil(names.length/2));
+        col1.forEach((n, i) => pdf.text(n, iconB64 ? 82 : 16, 102 + i*7));
+        col2.forEach((n, i) => pdf.text(n, 190, 102 + i*7));
+
+        // Date + version footer
+        pdf.setFontSize(8);
+        pdf.setTextColor(40, 40, 60);
+        pdf.text(`Generated ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}   ·   LAZ LAB ${APP_VER}`, 16, PH - 8);
+
+        // Corner marks
+        pdf.setDrawColor(188, 19, 254);
+        pdf.setLineWidth(0.4);
+        // top-right
+        pdf.line(PW-20, 8, PW-8, 8);
+        pdf.line(PW-8,  8, PW-8, 20);
+        // bottom-left
+        pdf.line(8, PH-20, 8,  PH-8);
+        pdf.line(8, PH-8,  20, PH-8);
+
+        // ── PROJECT PAGES — one card per page, 2 cards per page if ≥4 projects ──
+        const cardsPerPage = apps.length >= 4 ? 2 : 1;
+
+        for (let i = 0; i < apps.length; i += cardsPerPage) {
+            pdf.addPage();
+
+            // Dark bg
+            pdf.setFillColor(4, 4, 6);
+            pdf.rect(0, 0, PW, PH, 'F');
+
+            // Left accent bar
+            pdf.setFillColor(188, 19, 254);
+            pdf.rect(0, 0, 3, PH, 'F');
+
+            // Render each card on this page
+            const pageApps = apps.slice(i, i + cardsPerPage);
+            const cardW    = cardsPerPage === 2 ? (PW - 36) / 2 : PW - 36;
+            const cardX    = [16, 16 + cardW + 8];
+            const cardY    = 14;
+            const cardH    = PH - 28;
+
+            for (let ci = 0; ci < pageApps.length; ci++) {
+                const app = pageApps[ci];
+                const cx  = cardX[ci];
+                const cy  = cardY;
+
+                // Card background
+                pdf.setFillColor(12, 12, 24);
+                pdf.roundedRect(cx, cy, cardW, cardH, 5, 5, 'F');
+                pdf.setDrawColor(26, 26, 46);
+                pdf.setLineWidth(0.3);
+                pdf.roundedRect(cx, cy, cardW, cardH, 5, 5, 'S');
+
+                // Top accent line on card
+                pdf.setDrawColor(188, 19, 254);
+                pdf.setLineWidth(0.5);
+                pdf.line(cx + cardW*0.15, cy + 0.3, cx + cardW*0.85, cy + 0.3);
+
+                // Slot number badge — top right of card
+                const slotNum = 'LAZ-' + String(i + ci + 1).padStart(3, '0');
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(7);
+                pdf.setTextColor(50, 50, 80);
+                pdf.text(slotNum, cx + cardW - 4, cy + 7, { align:'right' });
+
+                // App icon
+                const iconSrc = app.iconData || iconB64;
+                let iconY = cy + 10;
+                if (iconSrc) {
+                    pdf.setFillColor(14, 14, 28);
+                    pdf.roundedRect(cx + 6, iconY, 22, 22, 4, 4, 'F');
+                    pdf.setDrawColor(188, 19, 254);
+                    pdf.setLineWidth(0.3);
+                    pdf.roundedRect(cx + 6, iconY, 22, 22, 4, 4, 'S');
+                    try { pdf.addImage(iconSrc, 'PNG', cx + 7, iconY + 1, 20, 20); } catch(_) {}
+                }
+
+                // App name
+                const textX = cx + 32;
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(14);
+                pdf.setTextColor(255, 255, 255);
+                const nameLines = pdf.splitTextToSize(app.name || 'Unnamed', cardW - 38);
+                pdf.text(nameLines[0], textX, iconY + 9);
+
+                // Version badge
+                const verLabel = 'v' + (app.version || '1.0');
+                pdf.setFillColor(60, 5, 80);
+                pdf.setDrawColor(188, 19, 254);
+                pdf.setLineWidth(0.3);
+                const verW = verLabel.length * 2.4 + 4;
+                pdf.roundedRect(textX, iconY + 12, verW, 5.5, 1, 1, 'FD');
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(7);
+                pdf.setTextColor(188, 19, 254);
+                pdf.text(verLabel, textX + 2, iconY + 16.5);
+
+                // Focus / category
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(8);
+                pdf.setTextColor(94, 241, 255);
+                pdf.text((app.focus || 'PWA').toUpperCase(), textX + verW + 4, iconY + 16.5);
+
+                // Divider
+                const divY = iconY + 26;
+                pdf.setDrawColor(30, 30, 50);
+                pdf.setLineWidth(0.2);
+                pdf.line(cx + 6, divY, cx + cardW - 6, divY);
+
+                // Description
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(8.5);
+                pdf.setTextColor(130, 130, 170);
+                const descLines = pdf.splitTextToSize(app.desc || 'Active neural build.', cardW - 14);
+                pdf.text(descLines.slice(0, 4), cx + 6, divY + 8);
+
+                // Tags
+                const tags = (app.tags || ['PWA']).slice(0, 6);
+                let tagX = cx + 6;
+                const tagY2 = divY + 8 + Math.min(descLines.length, 4) * 4 + 6;
+                tags.forEach(tag => {
+                    const tw = tag.length * 2.1 + 6;
+                    pdf.setFillColor(10, 25, 30);
+                    pdf.setDrawColor(30, 70, 80);
+                    pdf.setLineWidth(0.2);
+                    pdf.roundedRect(tagX, tagY2, tw, 5, 1, 1, 'FD');
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setFontSize(6.5);
+                    pdf.setTextColor(94, 241, 255);
+                    pdf.text(tag.toUpperCase(), tagX + 3, tagY2 + 3.5);
+                    tagX += tw + 3;
+                    if (tagX > cx + cardW - 20) return; // overflow guard
+                });
+
+                // Channel status badges
+                const statusY = cy + cardH - 18;
+                pdf.setDrawColor(30, 30, 50);
+                pdf.setLineWidth(0.2);
+                pdf.line(cx + 6, statusY - 4, cx + cardW - 6, statusY - 4);
+
+                if (app.stable) {
+                    pdf.setFillColor(5, 25, 5);
+                    pdf.setDrawColor(30, 80, 30);
+                    pdf.setLineWidth(0.2);
+                    pdf.roundedRect(cx + 6, statusY, 24, 6, 1, 1, 'FD');
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(6);
+                    pdf.setTextColor(57, 255, 20);
+                    pdf.text('● STABLE', cx + 8, statusY + 4.2);
+                }
+                if (app.test) {
+                    pdf.setFillColor(25, 15, 5);
+                    pdf.setDrawColor(80, 50, 10);
+                    pdf.setLineWidth(0.2);
+                    pdf.roundedRect(cx + 34, statusY, 20, 6, 1, 1, 'FD');
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(6);
+                    pdf.setTextColor(255, 149, 0);
+                    pdf.text('◈ TEST', cx + 36, statusY + 4.2);
+                }
+
+                // LAZ LAB brand — bottom right of card
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(7);
+                pdf.setTextColor(30, 30, 50);
+                pdf.text('LAZ LAB ⬡', cx + cardW - 5, cy + cardH - 5, { align:'right' });
+            }
+
+            // Page footer
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(7);
+            pdf.setTextColor(30, 30, 50);
+            pdf.text(`LAZ LAB Neural Command Hub  ·  Page ${pdf.internal.getNumberOfPages()}`, PW / 2, PH - 4, { align:'center' });
+        }
+
+        // Save
+        const dateStr = new Date().toISOString().slice(0, 10);
+        pdf.save(`LazLab_Portfolio_${dateStr}.pdf`);
+
+    } catch(err) {
+        alert('PDF export failed: ' + err.message);
+        console.error(err);
+    } finally {
+        if (btn) { btn.textContent = 'Export PDF'; btn.disabled = false; }
+    }
+}
+
+// ════════════════════════════════════════════════
+//  EXPORT / IMPORT
+// ════════════════════════════════════════════════
+function exportState(){
+    const payload={_lazlab_version:APP_VER,_exported:new Date().toISOString(),
+        apps,snapshots,notes:document.getElementById('project-notes').value};
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}));
+    a.download='LazLab_'+APP_VER+'_'+new Date().toISOString().slice(0,10)+'.json';
+    a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+function importState(e){
+    const file=e.target.files[0]; if(!file)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+        try{
+            const p=JSON.parse(ev.target.result);
+            if(!p._lazlab_version){alert('Not a valid LAZ LAB export.');return;}
+            if(!confirm(`Import ${p.apps?.length||0} slots + ${p.snapshots?.length||0} snapshots?\nThis REPLACES current state.`))return;
+            apps=p.apps||[]; snapshots=p.snapshots||[];
+            document.getElementById('project-notes').value=p.notes||'';
+            silentSave(); saveSnaps(); renderSlots(); renderSnaps(); updateDebugSidebar();
+            alert(`✓ Imported ${apps.length} slots, ${snapshots.length} snapshots.`);
+        }catch(err){alert('Import failed: '+err.message);}
+    };
+    r.readAsText(file); e.target.value='';
+}
+
+// ════════════════════════════════════════════════
+//  SERVICE WORKER
+// ════════════════════════════════════════════════
+function dlSW(){
+    const sw=`/* LAZ LAB sw.js v16 */
+const C='llv16b';const A=['./','./index.html','./manifest.json'];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)));self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([sw],{type:'text/javascript'}));
+    a.download='sw.js'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+    rlog('sw.js downloaded','ok');
+}
+
+// ════════════════════════════════════════════════
+//  UTIL
+// ════════════════════════════════════════════════
+function x(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+boot();
+</script>
+</body>
+</html>
