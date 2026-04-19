@@ -106,28 +106,52 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;
 .slot-del{position:absolute;top:9px;right:9px;background:none;border:none;color:var(--glow);cursor:pointer;font-size:13px;line-height:1;padding:0;opacity:.35}
 .slot-del:hover{color:var(--accent);opacity:1}
 
-/* Channel rows */
-.channels{display:flex;flex-direction:column;gap:5px;margin-bottom:7px}
-.channel-row{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:5px 8px}
-.channel-row.has-zip{border-color:rgba(94,241,255,.2)}
+/* Channel rows — redesigned */
+.channels{display:flex;flex-direction:column;gap:6px;margin-bottom:7px}
+.channel-row{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.channel-row.has-zip{border-color:rgba(94,241,255,.18)}
+.channel-row.loaded-html{border-color:rgba(188,19,254,.3)}
+.channel-row.loaded-url{border-color:rgba(255,149,0,.3)}
+.ch-top{display:flex;align-items:center;gap:6px;padding:5px 8px}
 .ch-badge{font-family:var(--fm);font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
   padding:2px 6px;border-radius:3px;flex-shrink:0}
 .ch-badge.stable{background:rgba(57,255,20,.12);color:var(--green);border:1px solid rgba(57,255,20,.25)}
 .ch-badge.test{background:rgba(255,149,0,.1);color:var(--warn);border:1px solid rgba(255,149,0,.25)}
-.ch-file{font-family:var(--fm);font-size:9px;color:var(--glow);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-file{font-family:var(--fm);font-size:9px;color:var(--glow);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ch-file.loaded{color:var(--text)}
-.ch-actions{display:flex;gap:4px;flex-shrink:0}
-.ch-btn{padding:3px 7px;cursor:pointer;background:transparent;border:1px solid var(--glow-d);
-  border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--glow);text-transform:uppercase;letter-spacing:1px}
-.ch-btn:hover{color:var(--text);border-color:#444}
-.ch-btn.promote{color:var(--green);border-color:rgba(57,255,20,.25)}
-.ch-btn.promote:hover{background:rgba(57,255,20,.08)}
-.ch-btn.launch{color:var(--glow);border-color:var(--glow-d)}
-.ch-btn.launch:hover{background:var(--glow-d)}
-.pick-label{display:block;cursor:pointer;background:#0a0a12;border:1px dashed #28284a;
-  border-radius:5px;padding:5px 8px;font-family:var(--fm);font-size:9px;color:#484868;text-align:center}
-.pick-label:hover{border-color:var(--glow);color:var(--glow)}
-.pick-label input{display:none}
+.ch-play{padding:3px 10px;cursor:pointer;background:var(--glow);border:none;
+  border-radius:4px;font-family:var(--fm);font-size:10px;color:#fff;flex-shrink:0;line-height:1.4}
+.ch-play:hover{background:#a000e0}
+.ch-play:disabled{background:#333;color:#666;cursor:default}
+.ch-promote{padding:3px 7px;cursor:pointer;background:transparent;border:1px solid rgba(57,255,20,.25);
+  border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--green);text-transform:uppercase;flex-shrink:0}
+.ch-promote:hover{background:rgba(57,255,20,.08)}
+.ch-tabs{display:flex;border-top:1px solid var(--border)}
+.ch-tab{flex:1;padding:4px 0;cursor:pointer;background:transparent;border:none;border-right:1px solid var(--border);
+  font-family:var(--fm);font-size:8px;color:var(--glow);text-transform:uppercase;letter-spacing:1px;opacity:.5}
+.ch-tab:last-child{border-right:none}
+.ch-tab:hover:not(.active){opacity:.8}
+.ch-tab.active{opacity:1;font-weight:700}
+.ch-tab.active.zip-tab{background:rgba(94,241,255,.08);color:var(--cyan)}
+.ch-tab.active.html-tab{background:rgba(188,19,254,.12);color:var(--glow)}
+.ch-tab.active.url-tab{background:rgba(255,149,0,.1);color:var(--warn)}
+.ch-input-area{padding:6px 8px;border-top:1px solid var(--border);display:none}
+.ch-input-area.visible{display:block}
+.ch-pick-row{display:flex;gap:5px;align-items:center}
+.ch-pick-label{display:inline-block;cursor:pointer;padding:4px 10px;border-radius:4px;
+  font-family:var(--fm);font-size:8px;text-transform:uppercase;letter-spacing:1px;border:1px dashed var(--glow-d);color:var(--glow)}
+.ch-pick-label:hover{border-color:var(--glow);background:var(--glow-d)}
+.ch-pick-label input{display:none}
+.ch-clear-btn{padding:3px 7px;cursor:pointer;background:transparent;border:1px solid rgba(255,60,60,.25);
+  border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--accent);text-transform:uppercase}
+.ch-clear-btn:hover{background:rgba(255,60,60,.08)}
+.ch-url-wrap{display:flex;gap:4px}
+.ch-url-input{flex:1;background:#060609;border:1px solid var(--border);color:var(--text);
+  padding:4px 7px;border-radius:4px;font-family:var(--fm);font-size:9px}
+.ch-url-input:focus{outline:none;border-color:var(--warn)}
+.ch-url-set{padding:4px 8px;cursor:pointer;background:transparent;border:1px solid rgba(255,149,0,.3);
+  border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--warn);text-transform:uppercase;white-space:nowrap}
+.ch-url-set:hover{background:rgba(255,149,0,.08)}
 
 /* Slot notes */
 .slot-notes-wrap{margin-top:6px}
@@ -429,12 +453,6 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;
 .suite-pass{background:rgba(57,255,20,.06);color:var(--green);border:1px solid rgba(57,255,20,.15)}
 .suite-fail{background:rgba(255,60,60,.06);color:var(--accent);border:1px solid rgba(255,60,60,.15)}
 
-/* Channel URL input */
-.ch-url-row{display:flex;gap:4px;margin-top:4px}
-.ch-url-input{flex:1;background:#060609;border:1px solid var(--border);color:var(--text);padding:4px 7px;border-radius:5px;font-family:var(--fm);font-size:9px}
-.ch-url-input:focus{outline:none;border-color:var(--glow)}
-.ch-url-btn{padding:4px 8px;cursor:pointer;background:transparent;border:1px solid var(--glow-d);border-radius:4px;font-family:var(--fm);font-size:8px;color:var(--glow);text-transform:uppercase}
-.ch-url-btn:hover{background:var(--glow-d)}
 
 </style>
 </head>
@@ -904,14 +922,10 @@ function renderSlots() {
         return;
     }
     el.innerHTML = apps.map(a => {
-        const isDbg     = debugId === a.id;
-        const hasStable = !!a.stable;
-        const hasTest   = !!a.test;
-        const stableFile = hasStable ? (a.stable.needsReload ? '↻ ' + a.stable.file : a.stable.file) : '— empty';
-        const testFile   = hasTest   ? (a.test.needsReload   ? '↻ ' + a.test.file   : a.test.file)   : '— empty';
+        const isDbg = debugId === a.id;
 
         return `
-        <div class="slot${hasStable?' has-stable':''}${isDbg?' debugging':''}">
+        <div class="slot${a.stable?' has-stable':''}${isDbg?' debugging':''}">
           <button class="slot-del" onclick="deleteSlot(${a.id})">✕</button>
           <div class="slot-top">
             <span class="slot-name">${x(a.name)}</span>
@@ -922,43 +936,47 @@ function renderSlots() {
 
           <!-- CHANNELS -->
           <div class="channels">
-            <!-- STABLE -->
-            <div class="channel-row${hasStable?' has-zip':''}">
-              <span class="ch-badge stable">STABLE</span>
-              <span class="ch-file${hasStable?' loaded':''}">${x(stableFile)}</span>
-              <div class="ch-actions">
-                <label class="ch-btn pick-label" title="Load ZIP" style="padding:3px 7px;border-radius:4px;font-size:8px;cursor:pointer;background:transparent;border:1px solid var(--glow-d);color:var(--glow);letter-spacing:1px;text-transform:uppercase;display:inline-block">
-                  ZIP<input type="file" accept=".zip" onchange="ingestZip(event,${a.id},'stable')" style="display:none">
-                </label>
-                <label class="ch-btn pick-label" title="Load single HTML file" style="padding:3px 7px;border-radius:4px;font-size:8px;cursor:pointer;background:transparent;border:1px solid var(--glow-d);color:var(--glow);letter-spacing:1px;text-transform:uppercase;display:inline-block">
-                  HTML<input type="file" accept=".html,.htm" onchange="ingestHtml(event,${a.id},'stable')" style="display:none">
-                </label>
-                ${hasStable?`<button class="ch-btn launch" onclick="setDebugTarget(${a.id},'stable')">▶</button>`:''}
-              </div>
-              <div class="ch-url-row">
-                <input type="text" class="ch-url-input" id="url-input-${a.id}-stable" placeholder="https://…" onkeydown="if(event.key==='Enter')ingestUrl(${a.id},'stable')">
-                <button class="ch-url-btn" onclick="ingestUrl(${a.id},'stable')">Set URL</button>
-              </div>
-            </div>
-            <!-- TEST -->
-            <div class="channel-row${hasTest?' has-zip':''}">
-              <span class="ch-badge test">TEST</span>
-              <span class="ch-file${hasTest?' loaded':''}">${x(testFile)}</span>
-              <div class="ch-actions">
-                <label class="ch-btn pick-label" title="Load ZIP" style="padding:3px 7px;border-radius:4px;font-size:8px;cursor:pointer;background:transparent;border:1px solid var(--glow-d);color:var(--glow);letter-spacing:1px;text-transform:uppercase;display:inline-block">
-                  ZIP<input type="file" accept=".zip" onchange="ingestZip(event,${a.id},'test')" style="display:none">
-                </label>
-                <label class="ch-btn pick-label" title="Load single HTML file" style="padding:3px 7px;border-radius:4px;font-size:8px;cursor:pointer;background:transparent;border:1px solid var(--glow-d);color:var(--glow);letter-spacing:1px;text-transform:uppercase;display:inline-block">
-                  HTML<input type="file" accept=".html,.htm" onchange="ingestHtml(event,${a.id},'test')" style="display:none">
-                </label>
-                ${hasTest?`<button class="ch-btn launch" onclick="setDebugTarget(${a.id},'test')">▶</button>`:''}
-                ${hasTest?`<button class="ch-btn promote" onclick="promoteTest(${a.id})" title="Promote test to stable">⬆ Stable</button>`:''}
-              </div>
-              <div class="ch-url-row">
-                <input type="text" class="ch-url-input" id="url-input-${a.id}-test" placeholder="https://…" onkeydown="if(event.key==='Enter')ingestUrl(${a.id},'test')">
-                <button class="ch-url-btn" onclick="ingestUrl(${a.id},'test')">Set URL</button>
-              </div>
-            </div>
+            ${['stable','test'].map(function(ch){
+              var chData = a[ch];
+              var loaded = !!chData;
+              var activeType = chData ? (chData.isUrl ? 'url' : chData.isHtml ? 'html' : 'zip') : 'zip';
+              var label = chData ? (chData.needsReload ? '\u21bb ' + chData.file : chData.file) : '\u2014 empty';
+              if(chData && chData.isUrl) label = chData.url;
+              var rowClass = loaded ? (chData.isUrl ? ' loaded-url' : chData.isHtml ? ' loaded-html' : ' has-zip') : '';
+              var isTest = ch === 'test';
+              var urlVal = (chData && chData.isUrl) ? chData.url : '';
+              return '<div class="channel-row' + rowClass + '" id="ch-row-' + a.id + '-' + ch + '">'
+                + '<div class="ch-top">'
+                + '<span class="ch-badge ' + ch + '">' + ch.toUpperCase() + '</span>'
+                + '<span class="ch-file' + (loaded ? ' loaded' : '') + '" id="ch-file-' + a.id + '-' + ch + '">' + x(label) + '</span>'
+                + (loaded && isTest ? '<button class="ch-promote" onclick="promoteTest(' + a.id + ')" title="Promote to stable">\u2b06</button>' : '')
+                + '<button class="ch-play"' + (loaded ? '' : ' disabled') + ' onclick="setDebugTarget(' + a.id + ',\'' + ch + '\')">\u25b6</button>'
+                + '</div>'
+                + '<div class="ch-tabs">'
+                + '<button class="ch-tab zip-tab' + (activeType==='zip'?' active':'') + '" onclick="chSelectTab(' + a.id + ',\'' + ch + '\',' + '\'zip\')">' + 'ZIP</button>'
+                + '<button class="ch-tab html-tab' + (activeType==='html'?' active':'') + '" onclick="chSelectTab(' + a.id + ',\'' + ch + '\',' + '\'html\')">' + 'HTML</button>'
+                + '<button class="ch-tab url-tab' + (activeType==='url'?' active':'') + '" onclick="chSelectTab(' + a.id + ',\'' + ch + '\',' + '\'url\')">' + 'URL</button>'
+                + '</div>'
+                + '<div class="ch-input-area' + (activeType==='zip'?' visible':'') + '" id="ch-area-' + a.id + '-' + ch + '-zip">'
+                + '<div class="ch-pick-row">'
+                + '<label class="ch-pick-label">' + (loaded && activeType==='zip' ? '\u2191 Replace ZIP' : '\u2b06 Choose ZIP')
+                + '<input type="file" accept=".zip" onchange="ingestZip(event,' + a.id + ',\'' + ch + '\')">' + '</label>'
+                + (loaded && activeType==='zip' ? '<button class="ch-clear-btn" onclick="clearChannel(' + a.id + ',\'' + ch + '\')">\u2715 Clear</button>' : '')
+                + '</div></div>'
+                + '<div class="ch-input-area' + (activeType==='html'?' visible':'') + '" id="ch-area-' + a.id + '-' + ch + '-html">'
+                + '<div class="ch-pick-row">'
+                + '<label class="ch-pick-label">' + (loaded && activeType==='html' ? '\u2191 Replace HTML' : '\u2b06 Choose HTML')
+                + '<input type="file" accept=".html,.htm" onchange="ingestHtml(event,' + a.id + ',\'' + ch + '\')">' + '</label>'
+                + (loaded && activeType==='html' ? '<button class="ch-clear-btn" onclick="clearChannel(' + a.id + ',\'' + ch + '\')">\u2715 Clear</button>' : '')
+                + '</div></div>'
+                + '<div class="ch-input-area' + (activeType==='url'?' visible':'') + '" id="ch-area-' + a.id + '-' + ch + '-url">'
+                + '<div class="ch-url-wrap">'
+                + '<input type="text" class="ch-url-input" id="url-input-' + a.id + '-' + ch + '" placeholder="https://\u2026" value="' + x(urlVal) + '" onkeydown="if(event.key===\'Enter\')ingestUrl(' + a.id + ',\'' + ch + '\')">'
+                + '<button class="ch-url-set" onclick="ingestUrl(' + a.id + ',\'' + ch + '\')">Set</button>'
+                + (loaded && activeType==='url' ? '<button class="ch-clear-btn" onclick="clearChannel(' + a.id + ',\'' + ch + '\')">\u2715</button>' : '')
+                + '</div></div>'
+                + '</div>';
+            }).join('')}
           </div>
 
           <!-- SLOT NOTES -->
@@ -1138,16 +1156,16 @@ const PROBE = `(function(){
     if(ev.data.__lazlab_crawl){
       var SELS='button,a,[role="button"],[onclick],input[type="submit"],input[type="button"],select,input:not([type="hidden"]),[tabindex]:not([tabindex="-1"])';
       if(ev.data.__lazlab_crawl==='scan'){
-        var els=Array.from(document.querySelectorAll(SELS)).filter(function(el){
-          var r=el.getBoundingClientRect();return r.width>0&&r.height>0;
-        });
-        var selectors=els.map(function(el){
+        var els=Array.from(document.querySelectorAll(SELS));
+        var seen={};
+        var selectors=[];
+        els.forEach(function(el){
           var s=el.tagName.toLowerCase();
           if(el.id)s='#'+el.id;
-          else if(el.name)s=el.tagName.toLowerCase()+'[name="'+el.name+'"]';
+          else if(el.getAttribute('name'))s=el.tagName.toLowerCase()+'[name="'+el.getAttribute('name')+'"]';
           else if(el.className&&typeof el.className==='string'&&el.className.trim())
             s=el.tagName.toLowerCase()+'.'+el.className.trim().split(/\s+/)[0];
-          return s;
+          if(!seen[s]){seen[s]=true;selectors.push(s);}
         });
         try{window.parent.postMessage({__lazlab_crawl_result:selectors},'*');}catch(ex){}
       } else if(ev.data.__lazlab_crawl==='click'){
@@ -2178,6 +2196,31 @@ function ingestUrl(id, channel) {
     rlog('URL SLOT [' + channel.toUpperCase() + '] SET ✓ — ' + url, 'ok');
 }
 
+
+// ════════════════════════════════════════════════
+//  CHANNEL TAB SWITCHING & CLEAR
+// ════════════════════════════════════════════════
+function chSelectTab(id, channel, type) {
+    ['zip','html','url'].forEach(function(t) {
+        var area = document.getElementById('ch-area-' + id + '-' + channel + '-' + t);
+        if (area) area.classList.toggle('visible', t === type);
+    });
+    var row = document.getElementById('ch-row-' + id + '-' + channel);
+    if (!row) return;
+    row.querySelectorAll('.ch-tab').forEach(function(btn) {
+        btn.classList.toggle('active', btn.classList.contains(type + '-tab'));
+    });
+}
+
+function clearChannel(id, channel) {
+    var app = apps.find(function(a){ return a.id === id; });
+    if (!app) return;
+    if (!confirm('Clear ' + channel.toUpperCase() + ' channel?')) return;
+    app[channel] = null;
+    silentSave(); renderSlots(); updateStatusLights();
+    rlog('SLOT [' + channel.toUpperCase() + '] CLEARED', 'ok');
+}
+
 // ════════════════════════════════════════════════
 //  AUTO-CRAWLER
 // ════════════════════════════════════════════════
@@ -2190,22 +2233,48 @@ function startCrawl() {
     }
     stopCrawl();
     crawlRunning = true;
-    document.querySelector('.crawl-progress').classList.add('active');
-    document.querySelector('.crawl-progress').textContent = 'Requesting element list…';
-    feedEv('info', 'Auto-crawler started — scanning for interactive elements…');
-    // Ask the probe to enumerate and return all interactive elements
-    try {
-        frame.contentWindow.postMessage({ __lazlab_crawl: 'scan' }, '*');
-    } catch(e) {
-        feedEv('error', 'Crawler: cannot reach iframe — ' + e.message);
-        crawlRunning = false;
-    }
+    const prog = document.querySelector('.crawl-progress');
+    prog.classList.add('active');
+    prog.textContent = 'Requesting element list…';
+    feedEv('info', 'Auto-crawler: scanning for interactive elements…');
+
+    // Small delay lets the app fully settle before we postMessage
+    // Also set a timeout so we don't hang if the probe doesn't respond
+    let responded = false;
+    crawlTimer = setTimeout(function() {
+        if (!responded) {
+            feedEv('warn', 'Crawler: no response from probe — app may be cross-origin or probe not loaded');
+            prog.textContent = 'No response. Is a local ZIP/HTML session active?';
+            crawlRunning = false;
+        }
+    }, 4000);
+
+    setTimeout(function() {
+        try {
+            frame.contentWindow.postMessage({ __lazlab_crawl: 'scan' }, '*');
+        } catch(e) {
+            feedEv('error', 'Crawler: cannot reach iframe — ' + e.message);
+            crawlRunning = false;
+        }
+    }, 300);
+
+    // Patch executeCrawlQueue to clear the timeout when response arrives
+    window._crawlResponseExpected = true;
 }
 
 function executeCrawlQueue(selectors) {
     if (!crawlRunning) return;
+    window._crawlResponseExpected = false;
+    // Clear the timeout — we got a response
+    if (crawlTimer) { clearTimeout(crawlTimer); crawlTimer = null; }
     crawlQueue = selectors;
     const total = crawlQueue.length;
+    if (total === 0) {
+        feedEv('info', 'Crawler: no interactive elements found on current view');
+        document.querySelector('.crawl-progress').textContent = 'No elements found';
+        crawlRunning = false;
+        return;
+    }
     feedEv('info', 'Crawler: ' + total + ' elements found — clicking each…');
     crawlStep(0, total);
 }
@@ -2233,6 +2302,7 @@ function crawlStep(idx, total) {
 
 function stopCrawl() {
     crawlRunning = false;
+    window._crawlResponseExpected = false;
     if (crawlTimer) { clearTimeout(crawlTimer); crawlTimer = null; }
     crawlQueue = [];
     const prog = document.querySelector('.crawl-progress');
