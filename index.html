@@ -1227,7 +1227,8 @@ async function launchDebug() {
             frame.src = ch.url;
             setPill('live','LIVE');
             feedEv('info', 'URL session — ' + ch.url);
-            feedEv('info', 'Note: probe injection blocked cross-origin. Click logging via page events only.');
+            feedEv('info', 'Note: probe cannot be injected cross-origin. Events, crawl, REPL and DOM snapshot unavailable.');
+            feedEv('info', 'Tip: download the site, load as ZIP or HTML for full debugging.');
         } catch(err) { setPill('err','ERROR'); feedEv('error','URL load failed: '+err.message); }
         return;
     }
@@ -1554,7 +1555,13 @@ function deleteSnap(id) {
 async function groqTriage() {
     const key = document.getElementById('groq-key').value.trim() || gKey;
     if (!key) { alert('Add your Groq API key in the PLAN tab first.'); return; }
-    if (!eventLog.length) { alert('No events recorded yet — run a session first.'); return; }
+    if (!eventLog.length) { alert('No session data yet. Launch a session and interact with the app first.'); return; }
+    // For URL sessions, note that only manually-fed events will be triaged
+    const _triageApp = apps.find(a => a.id === debugId);
+    const _trCh = _triageApp && _triageApp[debugCh];
+    if (_trCh && _trCh.isUrl && eventLog.filter(e => e.type !== 'info').length === 0) {
+        if (!confirm('URL sessions have no probe events — only session-start notes will be sent. Continue?')) return;
+    }
 
     // Collect flagged events first, fall back to last 100
     const list  = document.getElementById('event-list');
@@ -2231,42 +2238,48 @@ function startCrawl() {
     if (!frame || frame.style.display === 'none') {
         alert('No active session — launch a debug session first.'); return;
     }
+    // URL sessions are cross-origin — probe is not injected, crawler cannot work
+    const app = apps.find(a => a.id === debugId);
+    const ch  = app && app[debugCh];
+    if (ch && ch.isUrl) {
+        feedEv('warn', 'Crawler unavailable for URL sessions — probe cannot be injected cross-origin');
+        return;
+    }
     stopCrawl();
     crawlRunning = true;
+    window._crawlResponseExpected = true;
     const prog = document.querySelector('.crawl-progress');
     prog.classList.add('active');
     prog.textContent = 'Requesting element list…';
     feedEv('info', 'Auto-crawler: scanning for interactive elements…');
 
-    // Small delay lets the app fully settle before we postMessage
-    // Also set a timeout so we don't hang if the probe doesn't respond
-    let responded = false;
-    crawlTimer = setTimeout(function() {
-        if (!responded) {
-            feedEv('warn', 'Crawler: no response from probe — app may be cross-origin or probe not loaded');
-            prog.textContent = 'No response. Is a local ZIP/HTML session active?';
+    // Separate timeout timer (crawlTimer is used for step delays)
+    window._crawlTimeoutId = setTimeout(function() {
+        if (window._crawlResponseExpected) {
+            feedEv('warn', 'Crawler: probe did not respond — ensure session is fully loaded');
+            prog.textContent = 'No response from probe';
             crawlRunning = false;
+            window._crawlResponseExpected = false;
         }
-    }, 4000);
+    }, 5000);
 
+    // 400ms delay — lets app JS fully settle before postMessage
     setTimeout(function() {
         try {
             frame.contentWindow.postMessage({ __lazlab_crawl: 'scan' }, '*');
         } catch(e) {
             feedEv('error', 'Crawler: cannot reach iframe — ' + e.message);
             crawlRunning = false;
+            window._crawlResponseExpected = false;
         }
-    }, 300);
-
-    // Patch executeCrawlQueue to clear the timeout when response arrives
-    window._crawlResponseExpected = true;
+    }, 400);
 }
 
 function executeCrawlQueue(selectors) {
     if (!crawlRunning) return;
     window._crawlResponseExpected = false;
-    // Clear the timeout — we got a response
-    if (crawlTimer) { clearTimeout(crawlTimer); crawlTimer = null; }
+    // Clear the response-timeout (separate from step timer)
+    if (window._crawlTimeoutId) { clearTimeout(window._crawlTimeoutId); window._crawlTimeoutId = null; }
     crawlQueue = selectors;
     const total = crawlQueue.length;
     if (total === 0) {
@@ -2304,6 +2317,7 @@ function stopCrawl() {
     crawlRunning = false;
     window._crawlResponseExpected = false;
     if (crawlTimer) { clearTimeout(crawlTimer); crawlTimer = null; }
+    if (window._crawlTimeoutId) { clearTimeout(window._crawlTimeoutId); window._crawlTimeoutId = null; }
     crawlQueue = [];
     const prog = document.querySelector('.crawl-progress');
     if (prog) prog.textContent = 'Stopped';
