@@ -1,4 +1,4 @@
-LAZLAB ZIP Inspector
+#LAZLAB ZIP Inspector
 A basic ZIP file browser built into LAZLAB. Upload, browse, export.
 
 What It Does
