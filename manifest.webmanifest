@@ -1,7 +1,7 @@
 {
   "name": "LAZLAB — The Workshop",
   "short_name": "LAZLAB",
-  "description": "The parent atelier behind the Lazzaro portfolio of single-file PWAs.",
+  "description": "The parent studio behind the Lazzaro portfolio of single-file PWAs.",
   "id": "/lazlab/",
   "start_url": "./",
   "scope": "./",

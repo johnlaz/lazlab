@@ -4,7 +4,7 @@
    - Network-first for the /app/ children (these are dev builds; freshness wins)
    - Offline fallback to the cached index.html for the LAZLAB shell only
 */
-const VERSION = 'lazlab-v2-neon-2026.05';
+const VERSION = 'lazlab-v6-cards-2026.05';
 const SHELL = [
   './',
   './index.html',

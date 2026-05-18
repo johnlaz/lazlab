@@ -461,19 +461,6 @@ section{padding:96px 0;position:relative;overflow:hidden}
   margin-top:20px;padding-top:14px;border-top:1px solid var(--hairline);
   font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);
 }
-.app .foot .open{
-  color:var(--ink);transition:all .25s;display:inline-flex;align-items:center;gap:8px;
-  padding:6px 10px;margin:-6px -10px;border-radius:2px;
-}
-.app:hover .foot .open{color:var(--magenta-bright);text-shadow:0 0 12px var(--magenta-glow)}
-
-.app .ll-mark{
-  position:absolute;top:14px;right:14px;width:22px;height:22px;border-radius:50%;
-  opacity:.22;transition:opacity .35s, transform .4s;overflow:hidden;background:#000;
-  box-shadow:inset 0 0 0 1px rgba(217,70,239,.3);
-}
-.app .ll-mark img{width:100%;height:100%;object-fit:cover}
-.app:hover .ll-mark{opacity:.85;transform:scale(1.1)}
 
 /* ============================================================
    LIVE CONSOLE
@@ -977,13 +964,8 @@ function pad(n){return String(n).padStart(2,'0')}
 function renderPortfolio(filter){
   grid.innerHTML = APPS
     .filter(a => filter === 'all' ? true : a.status === filter)
-    .map(a => {
-      const href = a.slug ? `${APP_BASE}${a.slug}/` : '#top';
-      const isSelf = !a.slug;
-      const openLabel = isSelf ? 'You are here' : 'Launch';
-      return `
+    .map(a => `
       <article class="app" data-status="${a.status}">
-        <span class="ll-mark" aria-hidden="true"><img src="assets/logo-256.jpg" alt="" /></span>
         <div class="top">
           <span class="ord">№ ${pad(a.n)} / 22</span>
           <span class="badge ${a.status}">${a.status}</span>
@@ -993,10 +975,9 @@ function renderPortfolio(filter){
         <p class="desc">${a.desc}</p>
         <div class="foot">
           <span>LAZLAB</span>
-          <a class="open" href="${href}" ${isSelf ? '' : 'data-launch="1"'}>${openLabel} <span>→</span></a>
         </div>
       </article>
-    `;}).join('');
+    `).join('');
   grid.querySelectorAll('.app').forEach(card => {
     card.addEventListener('mousemove', e => {
       const r = card.getBoundingClientRect();
