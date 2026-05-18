@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<base href="./" />
 <meta name="theme-color" content="#040406" />
-<title>LAZLAB — The Lab</title>
-<meta name="description" content="LAZLAB is the parent lab behind ARMORY, BRVTY, AXIOM, NEXUS, J-VOX and the rest of the Lazzaro portfolio. Where every experiment is wired, debugged, and shipped." />
+<title>LAZLAB — The Studio</title>
+<meta name="description" content="LAZLAB is the parent studio behind ARMORY, BRVTY, AXIOM, NEXUS, J-VOX and the rest of the Lazzaro portfolio. Where every experiment is wired, debugged, and shipped." />
 
 <!-- Favicon: real logo, scaled -->
 <link rel="icon" type="image/jpeg" href="assets/logo-256.jpg" />
@@ -19,8 +20,8 @@
 <meta name="mobile-web-app-capable" content="yes" />
 
 <!-- Open Graph -->
-<meta property="og:title" content="LAZLAB — The Lab" />
-<meta property="og:description" content="The parent lab behind the Lazzaro portfolio of single-file PWAs." />
+<meta property="og:title" content="LAZLAB — The Studio" />
+<meta property="og:description" content="The parent studio behind the Lazzaro portfolio of single-file PWAs." />
 <meta property="og:image" content="assets/logo-1024.jpg" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://johnlaz.github.io/lazlab/" />
@@ -107,6 +108,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 
 /* Shell */
 .shell{max-width:1320px;margin:0 auto;padding:0 28px;position:relative;z-index:10}
+@media (max-width:480px){.shell{padding:0 18px}}
 
 /* ============================================================
    TOP BAR
@@ -167,6 +169,10 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   100%{box-shadow:0 0 0 0 rgba(34,211,238,0), 0 0 10px var(--cyan-glow)}
 }
 @media (max-width:880px){.nav{display:none}}
+@media (max-width:520px){
+  .topbar-inner{gap:12px;padding:12px 0}
+  .status-pill{display:none}
+}
 
 /* ============================================================
    HERO
@@ -176,6 +182,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   padding:80px 0 96px;
   min-height:90vh;
   display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center;
+  overflow:hidden;
 }
 @media (max-width:1020px){.hero{grid-template-columns:1fr;min-height:auto;padding:56px 0 64px;gap:32px}}
 
@@ -256,9 +263,20 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .stat .n.m{color:var(--magenta-bright);text-shadow:0 0 18px var(--magenta-glow)}
 .stat .l{font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-mute);margin-top:8px}
 
+@media (max-width:520px){
+  .hero-stats{grid-template-columns:repeat(2,1fr);row-gap:18px}
+  .hero-stats .stat{padding:0 14px}
+  .hero-stats .stat:nth-child(odd){border-left:none;padding-left:0}
+  .hero-stats .stat:nth-child(even){border-left:1px solid var(--hairline)}
+  .hero-stats .stat:nth-child(3){border-top:1px solid var(--hairline);padding-top:18px}
+  .hero-stats .stat:nth-child(4){border-top:1px solid var(--hairline);padding-top:18px}
+  .stat .n{font-size:28px}
+}
+
 /* ---- THE MARK STAGE ---- */
 .mark-stage{position:relative;aspect-ratio:1/1;max-width:560px;margin-left:auto;display:grid;place-items:center}
 @media (max-width:1020px){.mark-stage{margin:0 auto;max-width:380px}}
+@media (max-width:480px){.mark-stage{max-width:300px}}
 
 .mark-stage svg.bezel{position:absolute;inset:0;width:100%;height:100%;animation:spin 90s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -310,10 +328,16 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 .readout .val{color:var(--cyan-bright);text-shadow:0 0 8px var(--cyan-glow)}
 .readout .val.m{color:var(--magenta-bright);text-shadow:0 0 8px var(--magenta-glow)}
 
+/* Mobile: corner readouts & caption collide with the disc — hide them */
+@media (max-width:680px){
+  .mark-stage .readout,
+  .mark-stage .mark-caption{display:none}
+}
+
 /* ============================================================
    SECTION FRAME
    ============================================================ */
-section{padding:96px 0;position:relative}
+section{padding:96px 0;position:relative;overflow:hidden}
 @media (max-width:780px){section{padding:64px 0}}
 
 .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-bottom:48px;flex-wrap:wrap}
@@ -465,6 +489,7 @@ section{padding:96px 0;position:relative}
 
 .console-main{padding:28px;border-right:1px solid var(--hairline);position:relative;min-height:380px}
 @media (max-width:900px){.console-main{border-right:none;border-bottom:1px solid var(--hairline)}}
+@media (max-width:520px){.console-main{padding:20px 16px;min-height:280px}}
 .console-head{
   display:flex;align-items:center;justify-content:space-between;
   font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;
@@ -476,6 +501,11 @@ section{padding:96px 0;position:relative}
 .log{font-family:var(--mono);font-size:12.5px;line-height:1.9;color:var(--ink-dim)}
 .log .line{display:grid;grid-template-columns:90px 70px 1fr;gap:14px;padding:3px 0;border-bottom:1px dashed var(--hairline)}
 .log .line:last-child{border-bottom:none}
+@media (max-width:520px){
+  .log{font-size:11.5px;line-height:1.7}
+  .log .line{grid-template-columns:1fr;gap:2px;padding:8px 0}
+  .log .ts{font-size:10px}
+}
 .log .ts{color:var(--ink-mute);font-size:11px}
 .log .lvl{font-size:10px;letter-spacing:.2em;font-weight:700}
 .log .lvl.ok{color:var(--cyan-bright);text-shadow:0 0 6px var(--cyan-glow)}
@@ -486,6 +516,7 @@ section{padding:96px 0;position:relative}
 .log .msg .v{color:var(--magenta-bright)}
 
 .console-side{padding:28px}
+@media (max-width:520px){.console-side{padding:20px 16px}}
 .console-side h5{
   font-family:var(--mono);font-size:10px;letter-spacing:.28em;text-transform:uppercase;font-weight:700;
   color:var(--ink-mute);margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--hairline);
@@ -597,6 +628,21 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
 }
+
+/* Narrow-mobile overflow guard + readability shrinks */
+@media (max-width:520px){
+  .hero-meta{font-size:10px;letter-spacing:.22em}
+  .hero-meta::before{width:24px}
+  .section-head h2{font-size:clamp(30px,8vw,44px)}
+  .section-head .right{font-size:10px}
+  .eyebrow{font-size:10px;letter-spacing:.28em}
+  .hero-ctas .btn{padding:13px 18px;font-size:10.5px;letter-spacing:.2em}
+}
+@media (max-width:380px){
+  .hero h1{font-size:clamp(44px,12vw,64px)}
+  .hero .lede{font-size:15.5px}
+  .hero-meta{font-size:9px;letter-spacing:.18em}
+}
 </style>
 </head>
 <body>
@@ -607,7 +653,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
       <span class="markwrap" aria-hidden="true">
         <img src="assets/logo-256.jpg" alt="" width="34" height="34" />
       </span>
-      <span class="name">LAZ<em>·</em>LAB</span>
+      <span class="name">LAZLAB</span>
     </a>
     <nav class="nav" aria-label="Primary">
       <a href="#mission">Mission</a>
@@ -639,14 +685,14 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
       <span class="thin">gets</span> <span class="cyan">wired.</span>
     </h1>
     <p class="lede reveal">
-      <strong>LAZLAB</strong> is the parent lab — the bench where every Lazzaro product is
+      <strong>LAZLAB</strong> is the parent studio — the bench where every Lazzaro product is
       <span class="m">debugged</span>, <span class="c">tested</span>, and shipped. One developer,
       single-file PWAs, real APIs only, and a refusal to ever ship simulated data.
     </p>
 
     <div class="hero-ctas reveal">
       <a href="#portfolio" class="btn primary">Browse the Portfolio <span class="arrow">→</span></a>
-      <a href="#console" class="btn cyan">Live Console <span class="arrow">→</span></a>
+      <a href="app/index/" class="btn cyan">Live Console <span class="arrow">→</span></a>
     </div>
 
     <div class="hero-stats reveal">
@@ -679,7 +725,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
       <img src="assets/logo-1024.jpg" alt="LAZLAB" width="1024" height="1024" />
     </div>
 
-    <span class="mark-caption">LAZ·LAB · A LAB MARK · OPERATING SINCE 2024</span>
+    <span class="mark-caption">LAZLAB · A LAB MARK · OPERATING SINCE 2024</span>
 
     <div class="readout tl"><span class="lbl">UPLINK</span><span class="val">● OPERATIONAL</span></div>
     <div class="readout tr"><span class="lbl">BUILD</span><span class="val m">v2026.05</span></div>
@@ -693,7 +739,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
   <div class="section-head">
     <div class="left">
       <div class="eyebrow"><span class="num">01 ·</span> The Manifesto</div>
-      <h2>A small <span class="m">lab</span><br>that ships like a <span class="c">fleet.</span></h2>
+      <h2>A small <span class="m">studio</span><br>that ships like a <span class="c">fleet.</span></h2>
     </div>
     <div class="right">RULES OF THE HOUSE<br>EST. 2024</div>
   </div>
@@ -709,7 +755,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
       </p>
       <p class="copy">
         Every product is a <span class="c">single file</span> — no build steps, no dependencies
-        that rot, no excuses. The lab is private. The output is public.
+        that rot, no excuses. The studio is private. The output is public.
       </p>
 
       <div class="tenets">
@@ -846,7 +892,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
     <h3>Building something <span class="m">in the same key?</span><br>The bench is open.</h3>
     <p class="sub">LAZLAB takes select collaborations — non-profit work, AAC, real-estate tooling, AI-integrated tooling. Email goes through.</p>
     <div class="ctas">
-      <a href="mailto:hello@lazlab.dev" class="btn primary">hello@lazlab.dev <span class="arrow">→</span></a>
+      <a href="mailto:lazlab.io@gmail.com" class="btn primary">lazlab.io@gmail.com <span class="arrow">→</span></a>
       <a href="#portfolio" class="btn cyan">Back to Portfolio <span class="arrow">↑</span></a>
     </div>
   </div>
@@ -859,16 +905,16 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
       <div class="foot-brand">
         <div class="seal">
           <span class="ring"><img src="assets/logo-256.jpg" alt="" width="52" height="52" /></span>
-          <span class="nm">LAZ<em>·</em>LAB</span>
+          <span class="nm">LAZLAB</span>
         </div>
-        <p>An independent lab in Orlando, FL. Parent of the Lazzaro portfolio of single-file PWAs.</p>
+        <p>An independent studio in Orlando, FL. Parent of the Lazzaro portfolio of single-file PWAs.</p>
       </div>
       <div class="foot-col">
-        <h6>Lab</h6>
+        <h6>Studio</h6>
         <ul>
           <li><a href="#mission">Mission</a></li>
           <li><a href="#stack">The Stack</a></li>
-          <li><a href="#console">Live Console</a></li>
+          <li><a href="app/index/">Live Console</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </div>
@@ -921,7 +967,7 @@ const APPS = [
   {n:19,slug:"remix-reel",    name:"Remix Reel",         v:"v1",    tag:"Pop-Art Posters",        status:"stable", desc:"Pop-art movie poster generator. Upload a still, get a poster worth framing."},
   {n:20,slug:"cathys-neighborhood",name:"Cathy's Neighborhood",v:"v1", tag:"Kids · Arcade",        status:"stable", desc:"Interactive neighborhood map with an arcade hub. Built for a specific kid. Loved by many."},
   {n:21,slug:"lazzaro-wellness",name:"Lazzaro Wellness", v:"v1",    tag:"Private · Family",       status:"debug",  desc:"Private offline app for personal/family strategy records. Six tabs, Groq clinical summaries, Dual Session Mediator. Quiet build."},
-  {n:22,slug:"",              name:"LAZLAB Core",        v:"v∞",    tag:"The Lab",                status:"debug",  desc:"This site. The parent. Where every experiment is debugged and tested before it ships under its own brand."},
+  {n:22,slug:"",              name:"LAZLAB Core",        v:"v∞",    tag:"The Studio",             status:"debug",  desc:"This site. The parent. Where every experiment is debugged and tested before it ships under its own brand."},
 ];
 
 const APP_BASE = "app/";
@@ -946,7 +992,7 @@ function renderPortfolio(filter){
         <div class="tag">${a.tag}</div>
         <p class="desc">${a.desc}</p>
         <div class="foot">
-          <span>LAZ·LAB</span>
+          <span>LAZLAB</span>
           <a class="open" href="${href}" ${isSelf ? '' : 'data-launch="1"'}>${openLabel} <span>→</span></a>
         </div>
       </article>
