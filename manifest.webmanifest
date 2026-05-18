@@ -1,0 +1,25 @@
+{
+  "name": "LAZLAB — The Workshop",
+  "short_name": "LAZLAB",
+  "description": "The parent atelier behind the Lazzaro portfolio of single-file PWAs.",
+  "id": "/lazlab/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080a0d",
+  "theme_color": "#080a0d",
+  "categories": ["productivity", "utilities", "developer"],
+  "icons": [
+    { "src": "icons/icon-192.png",          "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png",          "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "OEL Command",  "short_name": "OEL",      "url": "./app/oel-command/",  "icons": [{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"}] },
+    { "name": "J-VOX AAC",    "short_name": "J-VOX",    "url": "./app/jvox/",          "icons": [{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"}] },
+    { "name": "AXIOM",        "short_name": "AXIOM",    "url": "./app/axiom/",         "icons": [{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"}] },
+    { "name": "NEXUS",        "short_name": "NEXUS",    "url": "./app/nexus/",         "icons": [{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"}] }
+  ]
+}
