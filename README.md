@@ -16,7 +16,7 @@ The command bench for single-file web apps — installable, offline-ready, and e
 
 <br>
 
-<img src="app/screenshots/hub-debug-wide.png" alt="LAZLAB Hub running a live debug session: event feed, error fingerprints and stats" width="920">
+<img src="app/shot-debug-wide.png" alt="LAZLAB Hub running a live debug session: event feed, error fingerprints and stats" width="920">
 
 </div>
 
@@ -47,7 +47,7 @@ No servers. No accounts. No installers. One file, one tap, and it lives on your 
 | **🌗 Made to be read** | Light and dark themes, four text sizes, high-contrast labels, big tap targets. |
 
 <div align="center">
-<img src="app/screenshots/hub-portfolio-wide.png" alt="Portfolio view in light mode" width="760">
+<img src="app/shot-portfolio-wide.png" alt="Portfolio view in light mode" width="760">
 </div>
 
 ## Live URLs & install (10 seconds)
@@ -103,18 +103,16 @@ keep working offline.
 
 ```
 lazlab/
-├─ index.html              the Studio site (landing)
-├─ sw.js                   retirement worker: clears the old Studio cache, then unregisters (temporary)
 ├─ README.md
-├─ assets/                 logo-256 / 512 / 1024 (.jpg)
+├─ index.html              the Studio site (plain landing page)
 ├─ docs/                   README visuals only (banner, how-it-works, architecture SVGs)
-├─ icons/                  apple-touch-icon.png (landing)
 └─ app/                    ← the Hub
    ├─ index.html           the whole app: HTML, CSS and vanilla JS in one file
-   ├─ manifest.webmanifest Hub PWA manifest      (id /lazlab/app/, scope /lazlab/app/)
-   ├─ sw.js                Hub service worker    (scope /lazlab/app/)
-   ├─ icons/               192 / 512, maskable, Apple touch icon
-   └─ screenshots/         hub-{debug,portfolio}-{narrow,wide}.png — install dialog + this README
+   ├─ manifest.webmanifest Hub PWA manifest (id /lazlab/app/, scope /lazlab/app/)
+   ├─ sw.js                Hub service worker (scope /lazlab/app/)
+   ├─ icon-192.png         app icon, maskable-safe
+   ├─ icon-512.png         app icon, maskable-safe (also the logo on the landing page)
+   └─ shot-*.png           install-dialog screenshots, also used in this README
 ```
 
 **How the offline layer behaves**
@@ -127,8 +125,7 @@ lazlab/
 | `api.groq.com`, URL debug sessions, anything else | Untouched. |
 
 The Hub's worker only deletes caches it created (`lazlab-hub-*`) — important, because every app on `johnlaz.github.io`
-shares one origin and one cache store. The landing page has no manifest and no offline layer; the root `sw.js` is a
-temporary retirement worker that cleans up the old Studio cache and can be deleted after a few weeks.
+shares one origin and one cache store. The landing page has no manifest and no offline layer.
 
 ## Deploy & update
 
@@ -142,7 +139,7 @@ The landing page needs no version bump: edit `index.html` and push.
 
 | Version | Date | Changes |
 |---|---|---|
-| Hub v2.3.1 | 2026-10-08 | Landing is now a plain page (no manifest, no offline cache; old Studio worker retires itself). Repo cleanup: removed duplicate and unused icons, stray files and the duplicate `app/README.md`. Hub now precaches only the 192 / 512 icons. Studio footer updated. README restructured with SVG banner, flow and architecture visuals in `docs/`. |
+| Hub v2.3.2 | 2026-10-08 | Flat layout: root is `README.md`, `index.html`, `docs/`, `app/`; icons and screenshots live directly in `app/`. Landing is a plain page (no manifest, no service worker). Repo cleanup: removed duplicate and unused icons, stray files and the duplicate `app/README.md`. Hub now precaches only the 192 / 512 icons. Studio footer updated. README restructured with SVG banner, flow and architecture visuals in `docs/`. |
 | Hub v2.3 | 2026-10-01 | Phone layout fixes, Groq model picker with key-fetched refresh, split into Studio site at root and Hub in `/app`. |
 
 ## The studio

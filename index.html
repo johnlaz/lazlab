@@ -9,10 +9,10 @@
 <meta name="description" content="LAZLAB is the parent studio behind ARMORY, BRVTY, AXIOM, NEXUS, J-VOX and the rest of the Lazzaro portfolio. Where every experiment is wired, debugged, and shipped." />
 
 <!-- Favicon: real logo, scaled -->
-<link rel="icon" type="image/jpeg" href="assets/logo-256.jpg" />
+<link rel="icon" type="image/png" href="app/icon-192.png" />
 
 <!-- PWA -->
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="apple-touch-icon" href="app/icon-192.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="LAZLAB" />
@@ -21,8 +21,8 @@
 <!-- Open Graph -->
 <meta property="og:title" content="LAZLAB — The Studio" />
 <meta property="og:description" content="The parent studio behind the Lazzaro portfolio of single-file PWAs." />
-<meta property="og:image" content="https://johnlaz.github.io/lazlab/assets/logo-1024.jpg" />
-<meta name="twitter:image" content="https://johnlaz.github.io/lazlab/assets/logo-1024.jpg" />
+<meta property="og:image" content="https://johnlaz.github.io/lazlab/app/icon-512.png" />
+<meta name="twitter:image" content="https://johnlaz.github.io/lazlab/app/icon-512.png" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://johnlaz.github.io/lazlab/" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -638,7 +638,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
   <div class="shell topbar-inner">
     <a href="#top" class="brand" aria-label="LAZLAB home">
       <span class="markwrap" aria-hidden="true">
-        <img src="assets/logo-256.jpg" alt="" width="34" height="34" />
+        <img src="app/icon-192.png" alt="" width="34" height="34" />
       </span>
       <span class="name">LAZLAB</span>
     </a>
@@ -709,7 +709,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
     <div class="glow-ring"></div>
 
     <div class="logo-disc">
-      <img src="assets/logo-1024.jpg" alt="LAZLAB" width="1024" height="1024" />
+      <img src="app/icon-512.png" alt="LAZLAB" width="1024" height="1024" />
     </div>
 
     <span class="mark-caption">LAZLAB · A LAB MARK · OPERATING SINCE 2024</span>
@@ -733,7 +733,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
 
   <div class="mission-grid">
     <div class="brain-emblem">
-      <img src="assets/logo-512.jpg" alt="LAZLAB brain emblem" width="512" height="512" />
+      <img src="app/icon-512.png" alt="LAZLAB brain emblem" width="512" height="512" />
     </div>
     <div>
       <p class="copy">
@@ -891,7 +891,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="seal">
-          <span class="ring"><img src="assets/logo-256.jpg" alt="" width="52" height="52" /></span>
+          <span class="ring"><img src="app/icon-192.png" alt="" width="52" height="52" /></span>
           <span class="nm">LAZLAB</span>
         </div>
         <p>An independent studio in Orlando, FL. Parent of the Lazzaro portfolio of single-file PWAs.</p>
@@ -1051,10 +1051,6 @@ window.addEventListener('load', () => {
   document.querySelectorAll('.hero .reveal').forEach((el,i) => {
     setTimeout(()=>el.classList.add('in'), 120 + i*120);
   });
-  // Retire the old Studio service worker (the landing is a plain page now). Safe to remove after a few weeks.
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(()=>{ /* silent */ });
-  }
 });
 </script>
 </body>
