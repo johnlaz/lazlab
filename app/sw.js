@@ -13,20 +13,15 @@
    so this worker never deletes or reads a cache it did not create.
 
    To ship an update: bump VERSION below (and APP_VER in index.html). */
-const VERSION = 'lazlab-hub-v2.3.0';
+const VERSION = 'lazlab-hub-v2.3.2';
 const PREFIX  = 'lazlab-hub-';
 
 const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icons/icon-96.png',
-  './icons/icon-144.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-192-maskable.png',
-  './icons/icon-512-maskable.png',
-  './icons/apple-touch-icon.png'
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 const CDN = [

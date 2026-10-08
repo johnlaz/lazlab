@@ -13,21 +13,19 @@
   "theme_color": "#040406",
   "categories": ["developer", "productivity", "utilities"],
   "icons": [
-    { "src": "icons/icon-192.png",          "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png",          "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "shortcuts": [
     { "name": "Portfolio",     "short_name": "Portfolio", "description": "Open the app portfolio", "url": "./#portfolio",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
     { "name": "Debug session", "short_name": "Debug",     "description": "Jump to the live debug view", "url": "./#debug",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] }
   ],
   "screenshots": [
-    { "src": "screenshots/hub-debug-wide.png",      "sizes": "1280x800", "type": "image/png", "form_factor": "wide",   "label": "Live debug session with the event feed and error fingerprints" },
-    { "src": "screenshots/hub-portfolio-wide.png",  "sizes": "1280x800", "type": "image/png", "form_factor": "wide",   "label": "Portfolio view in light mode" },
-    { "src": "screenshots/hub-debug-narrow.png",    "sizes": "390x844",  "type": "image/png", "form_factor": "narrow", "label": "Debug view on a phone" },
-    { "src": "screenshots/hub-portfolio-narrow.png","sizes": "390x844",  "type": "image/png", "form_factor": "narrow", "label": "Portfolio view on a phone" }
+    { "src": "shot-debug-wide.png",       "sizes": "1280x800", "type": "image/png", "form_factor": "wide",   "label": "Live debug session with the event feed and error fingerprints" },
+    { "src": "shot-portfolio-wide.png",   "sizes": "1280x800", "type": "image/png", "form_factor": "wide",   "label": "Portfolio view in light mode" },
+    { "src": "shot-debug-narrow.png",     "sizes": "390x844",  "type": "image/png", "form_factor": "narrow", "label": "Debug view on a phone" },
+    { "src": "shot-portfolio-narrow.png", "sizes": "390x844",  "type": "image/png", "form_factor": "narrow", "label": "Portfolio view on a phone" }
   ]
 }
