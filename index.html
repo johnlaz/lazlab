@@ -12,7 +12,6 @@
 <link rel="icon" type="image/jpeg" href="assets/logo-256.jpg" />
 
 <!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -926,7 +925,7 @@ footer{padding:56px 0 32px;border-top:1px solid var(--hairline);position:relativ
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© 2024 — 2026 LAZLAB · Orlando, FL</span>
+      <span>© 2026 LAZLAB Creations. All Rights Reserved. · <a href="mailto:lazlab.io@gmail.com">lazlab.io@gmail.com</a></span>
       <span class="right">A <span class="m">LAZLAB</span> CREATION · BUILT IN ONE FILE</span>
     </div>
   </div>
@@ -1052,6 +1051,7 @@ window.addEventListener('load', () => {
   document.querySelectorAll('.hero .reveal').forEach((el,i) => {
     setTimeout(()=>el.classList.add('in'), 120 + i*120);
   });
+  // Retire the old Studio service worker (the landing is a plain page now). Safe to remove after a few weeks.
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(()=>{ /* silent */ });
   }

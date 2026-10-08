@@ -1,10 +1,8 @@
 <div align="center">
 
-<img src="assets/logo-512.jpg" width="168" alt="LAZLAB">
+<img src="docs/banner.svg" alt="LAZLAB Hub: where every experiment gets wired" width="920">
 
 # LAZLAB Hub
-
-### Where every experiment gets wired.
 
 **Load a build. Watch it break. Fix it faster.**<br>
 The command bench for single-file web apps — installable, offline-ready, and entirely yours.
@@ -52,7 +50,7 @@ No servers. No accounts. No installers. One file, one tap, and it lives on your 
 <img src="app/screenshots/hub-portfolio-wide.png" alt="Portfolio view in light mode" width="760">
 </div>
 
-## Install it (10 seconds)
+## Live URLs & install (10 seconds)
 
 The Hub is a real installable app — its own icon, its own window, works with no connection.
 
@@ -65,24 +63,27 @@ The Hub is a real installable app — its own icon, its own window, works with n
 Once installed, the **App Mode** light on the home screen reads **Installed app · offline ready**. Long-press the icon for
 shortcuts straight to **Portfolio** and **Debug**.
 
-> The Hub and the Studio site are two separate installable apps. Install **LAZLAB Hub** from `/app/` for the tool.
-> The site at the root is the studio's front door.
+> Only the Hub is installable. The site at the root is a plain landing page, the studio's front door.
 
 ## Quick start
+
+<div align="center">
+<img src="docs/how-it-works.svg" alt="How LAZLAB Hub works: load, sandbox, watch, fingerprint, fix" width="920">
+</div>
 
 1. **Add a slot** — tap **+ New App Slot**, name it, and load a ZIP, HTML file or URL on the Stable or Test channel.
 2. **Set the target and launch** — hit ▶ on the channel, open the **Debug** tab, tap **Launch Session**.
 3. **Use the app like a user would.** Errors, warnings, requests and clicks stream in live. Tap **Triage Session with Groq**
    or **Send to Claude** when something looks off.
 
-## AI, on your terms
+## AI & model setup
 
 - **Bring your own Groq key.** Paste it in **Plan → Groq API Key**. It's stored in your browser and sent only to `api.groq.com`.
 - **The model picker keeps itself current.** The Hub asks Groq which chat models *your key* can use, lists the newest, and
   remembers your pick. If a model is ever retired, it re-pulls the list and retries once on a replacement.
 - **Nothing is simulated.** If there's no key, the AI buttons say so. They don't fake an answer.
 
-## Local-first, really
+## Data & privacy
 
 Everything — slots, notes, snapshots, your key — lives in your browser's `localStorage`. There is no backend and no account.
 **Export** writes it all to a JSON file; **Import** restores it on another device.
@@ -94,20 +95,26 @@ keep working offline.
 > **Good to know:** ZIP builds are held in memory (they're too big for `localStorage`), so re-load a ZIP after fully closing
 > the app. HTML and URL slots persist.
 
-## Under the hood
+## Repo layout
+
+<div align="center">
+<img src="docs/architecture.svg" alt="LAZLAB Hub architecture" width="920">
+</div>
 
 ```
 lazlab/
-├─ index.html              the Studio site
-├─ manifest.webmanifest    Studio PWA manifest   (id /lazlab/)
-├─ sw.js                   Studio service worker (scope /lazlab/)
-├─ assets/  icons/         logos and Studio icons
+├─ index.html              the Studio site (landing)
+├─ sw.js                   retirement worker: clears the old Studio cache, then unregisters (temporary)
+├─ README.md
+├─ assets/                 logo-256 / 512 / 1024 (.jpg)
+├─ docs/                   README visuals only (banner, how-it-works, architecture SVGs)
+├─ icons/                  apple-touch-icon.png (landing)
 └─ app/                    ← the Hub
    ├─ index.html           the whole app: HTML, CSS and vanilla JS in one file
    ├─ manifest.webmanifest Hub PWA manifest      (id /lazlab/app/, scope /lazlab/app/)
    ├─ sw.js                Hub service worker    (scope /lazlab/app/)
    ├─ icons/               192 / 512, maskable, Apple touch icon
-   └─ screenshots/         used by the install dialog and this README
+   └─ screenshots/         hub-{debug,portfolio}-{narrow,wide}.png — install dialog + this README
 ```
 
 **How the offline layer behaves**
@@ -119,20 +126,28 @@ lazlab/
 | JSZip, html2canvas, jsPDF, Google Fonts | Pre-cached, then stale-while-revalidate. |
 | `api.groq.com`, URL debug sessions, anything else | Untouched. |
 
-The two service workers never overlap: the Studio's ignores `/app/`, and each only deletes caches it created
-(`lazlab-site-*` and `lazlab-hub-*`) — important, because every app on `johnlaz.github.io` shares one origin and one cache store.
+The Hub's worker only deletes caches it created (`lazlab-hub-*`) — important, because every app on `johnlaz.github.io`
+shares one origin and one cache store. The landing page has no manifest and no offline layer; the root `sw.js` is a
+temporary retirement worker that cleans up the old Studio cache and can be deleted after a few weeks.
 
-## Shipping an update
+## Deploy & update
 
-1. Edit `app/index.html` (and bump `APP_VER` in it).
-2. Bump `VERSION` in `app/sw.js` (`lazlab-hub-v…`).
+1. Edit `app/index.html` (and bump `APP_VER` plus the visible version stamp in it).
+2. Bump `VERSION` in `app/sw.js` (`lazlab-hub-v…`) so it matches the stamp.
 3. Push to `main`. GitHub Pages publishes in about a minute; installed copies update on their next launch.
 
-Same for the site: edit `index.html`, bump `VERSION` in `sw.js`.
+The landing page needs no version bump: edit `index.html` and push.
+
+## Changelog
+
+| Version | Date | Changes |
+|---|---|---|
+| Hub v2.3.1 | 2026-10-08 | Landing is now a plain page (no manifest, no offline cache; old Studio worker retires itself). Repo cleanup: removed duplicate and unused icons, stray files and the duplicate `app/README.md`. Hub now precaches only the 192 / 512 icons. Studio footer updated. README restructured with SVG banner, flow and architecture visuals in `docs/`. |
+| Hub v2.3 | 2026-10-01 | Phone layout fixes, Groq model picker with key-fetched refresh, split into Studio site at root and Hub in `/app`. |
 
 ## The studio
 
-**LAZLAB** is an independent studio in Orlando, FL — one developer, single-file PWAs, real APIs only.
+**LAZLAB Creations** is an independent studio in Florida — one developer, single-file PWAs, real APIs only.
 Building something in the same key? **[lazlab.io@gmail.com](mailto:lazlab.io@gmail.com)**
 
-<div align="center"><sub>A <b>LAZLAB</b> creation · built in one file</sub></div>
+<div align="center"><sub>© 2026 LAZLAB Creations. All Rights Reserved.</sub></div>
