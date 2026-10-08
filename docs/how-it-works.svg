@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-labelledby="t d">
+  <title id="t">How LAZLAB Hub works</title>
+  <desc id="d">Five steps: load a build, run it in a sandbox with a probe, stream the live event feed, collapse errors into fingerprints, then triage with Groq or send the report to Claude.</desc>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#22d3ee"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="300" rx="18" fill="#0a0612"/>
+  <rect x="0.5" y="0.5" width="1199" height="299" rx="17.5" fill="none" stroke="#bc13fe" stroke-opacity="0.35"/>
+  <text x="600" y="44" text-anchor="middle" font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="20" font-weight="700" fill="#ffffff">From a build to a fix in five steps</text>
+  <g font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" text-anchor="middle">
+    <!-- 1 -->
+    <rect x="30" y="80" width="200" height="170" rx="14" fill="#120a1f" stroke="#bc13fe" stroke-opacity="0.7"/>
+    <circle cx="130" cy="112" r="16" fill="#bc13fe"/><text x="130" y="118" font-size="16" font-weight="700" fill="#ffffff">1</text>
+    <text x="130" y="154" font-size="17" font-weight="700" fill="#ffffff">Load</text>
+    <text x="130" y="178" font-size="13" fill="#d9d4e6">ZIP, HTML file</text>
+    <text x="130" y="196" font-size="13" fill="#d9d4e6">or live URL into</text>
+    <text x="130" y="214" font-size="13" fill="#d9d4e6">a Stable / Test slot</text>
+    <!-- 2 -->
+    <rect x="260" y="80" width="200" height="170" rx="14" fill="#120a1f" stroke="#22d3ee" stroke-opacity="0.7"/>
+    <circle cx="360" cy="112" r="16" fill="#22d3ee"/><text x="360" y="118" font-size="16" font-weight="700" fill="#040406">2</text>
+    <text x="360" y="154" font-size="17" font-weight="700" fill="#ffffff">Sandbox</text>
+    <text x="360" y="178" font-size="13" fill="#d9d4e6">Build runs in a frame</text>
+    <text x="360" y="196" font-size="13" fill="#d9d4e6">with a probe injected</text>
+    <text x="360" y="214" font-size="13" fill="#d9d4e6">to listen to it</text>
+    <!-- 3 -->
+    <rect x="490" y="80" width="200" height="170" rx="14" fill="#120a1f" stroke="#39ff14" stroke-opacity="0.7"/>
+    <circle cx="590" cy="112" r="16" fill="#39ff14"/><text x="590" y="118" font-size="16" font-weight="700" fill="#040406">3</text>
+    <text x="590" y="154" font-size="17" font-weight="700" fill="#ffffff">Watch</text>
+    <text x="590" y="178" font-size="13" fill="#d9d4e6">Console, network,</text>
+    <text x="590" y="196" font-size="13" fill="#d9d4e6">clicks and errors</text>
+    <text x="590" y="214" font-size="13" fill="#d9d4e6">stream in live</text>
+    <!-- 4 -->
+    <rect x="720" y="80" width="200" height="170" rx="14" fill="#120a1f" stroke="#ff9500" stroke-opacity="0.7"/>
+    <circle cx="820" cy="112" r="16" fill="#ff9500"/><text x="820" y="118" font-size="16" font-weight="700" fill="#040406">4</text>
+    <text x="820" y="154" font-size="17" font-weight="700" fill="#ffffff">Fingerprint</text>
+    <text x="820" y="178" font-size="13" fill="#d9d4e6">Identical errors fold</text>
+    <text x="820" y="196" font-size="13" fill="#d9d4e6">into one row with</text>
+    <text x="820" y="214" font-size="13" fill="#d9d4e6">a count</text>
+    <!-- 5 -->
+    <rect x="950" y="80" width="220" height="170" rx="14" fill="#120a1f" stroke="#bc13fe" stroke-opacity="0.7"/>
+    <circle cx="1060" cy="112" r="16" fill="#bc13fe"/><text x="1060" y="118" font-size="16" font-weight="700" fill="#ffffff">5</text>
+    <text x="1060" y="154" font-size="17" font-weight="700" fill="#ffffff">Fix</text>
+    <text x="1060" y="178" font-size="13" fill="#d9d4e6">Triage with Groq, or</text>
+    <text x="1060" y="196" font-size="13" fill="#d9d4e6">copy the report and</text>
+    <text x="1060" y="214" font-size="13" fill="#d9d4e6">send it to Claude</text>
+  </g>
+  <g stroke="#22d3ee" stroke-width="2.5" fill="none" marker-end="url(#ar)">
+    <line x1="232" y1="165" x2="256" y2="165"/>
+    <line x1="462" y1="165" x2="486" y2="165"/>
+    <line x1="692" y1="165" x2="716" y2="165"/>
+    <line x1="922" y1="165" x2="946" y2="165"/>
+  </g>
+</svg>

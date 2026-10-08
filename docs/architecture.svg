@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-labelledby="t d">
+  <title id="t">LAZLAB Hub architecture</title>
+  <desc id="d">The Studio site and the Hub are two separate installable apps on one GitHub Pages origin, each with its own service worker. The Hub is one HTML file that keeps data in localStorage, runs builds in a sandbox, and calls only api.groq.com, a CDN for three libraries, and Google Fonts.</desc>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#22d3ee"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="520" rx="18" fill="#0a0612"/>
+  <rect x="0.5" y="0.5" width="1199" height="519" rx="17.5" fill="none" stroke="#bc13fe" stroke-opacity="0.35"/>
+  <g font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+    <text x="600" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#ffffff">Architecture</text>
+    <text x="600" y="62" text-anchor="middle" font-size="13" fill="#8f87a6">johnlaz.github.io is one shared origin. Each service worker only touches its own cache.</text>
+
+    <!-- origin frame -->
+    <rect x="24" y="82" width="760" height="414" rx="16" fill="none" stroke="#8f87a6" stroke-opacity="0.6" stroke-dasharray="6 6"/>
+    <text x="42" y="106" font-size="12" fill="#8f87a6" letter-spacing="2" font-family="'SF Mono',Menlo,Consolas,monospace">GITHUB PAGES  ·  /lazlab/</text>
+
+    <!-- Studio -->
+    <rect x="46" y="122" width="210" height="150" rx="12" fill="#120a1f" stroke="#22d3ee" stroke-opacity="0.7"/>
+    <text x="151" y="150" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">Studio site</text>
+    <text x="151" y="172" text-anchor="middle" font-size="12" fill="#d9d4e6">/lazlab/  ·  index.html</text>
+    <text x="151" y="196" text-anchor="middle" font-size="12" fill="#d9d4e6">manifest id /lazlab/</text>
+    <text x="151" y="218" text-anchor="middle" font-size="12" fill="#22d3ee" font-family="'SF Mono',Menlo,Consolas,monospace">sw.js</text>
+    <text x="151" y="238" text-anchor="middle" font-size="11" fill="#8f87a6">cache lazlab-site-*</text>
+    <text x="151" y="256" text-anchor="middle" font-size="11" fill="#8f87a6">ignores /app/</text>
+
+    <!-- Hub -->
+    <rect x="290" y="122" width="470" height="352" rx="12" fill="#120a1f" stroke="#bc13fe" stroke-opacity="0.8"/>
+    <text x="525" y="150" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">LAZLAB Hub</text>
+    <text x="525" y="170" text-anchor="middle" font-size="12" fill="#d9d4e6">/lazlab/app/  ·  one file: HTML + CSS + vanilla JS</text>
+
+    <rect x="312" y="190" width="200" height="74" rx="10" fill="#0a0612" stroke="#bc13fe" stroke-opacity="0.5"/>
+    <text x="412" y="216" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">App slots</text>
+    <text x="412" y="236" text-anchor="middle" font-size="12" fill="#d9d4e6">Stable + Test channels</text>
+    <text x="412" y="253" text-anchor="middle" font-size="12" fill="#d9d4e6">ZIP / HTML / URL</text>
+
+    <rect x="538" y="190" width="200" height="74" rx="10" fill="#0a0612" stroke="#bc13fe" stroke-opacity="0.5"/>
+    <text x="638" y="216" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">Sandbox + probe</text>
+    <text x="638" y="236" text-anchor="middle" font-size="12" fill="#d9d4e6">Runs the build, reports</text>
+    <text x="638" y="253" text-anchor="middle" font-size="12" fill="#d9d4e6">console, network, errors</text>
+
+    <rect x="312" y="288" width="200" height="74" rx="10" fill="#0a0612" stroke="#bc13fe" stroke-opacity="0.5"/>
+    <text x="412" y="314" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">Debug engine</text>
+    <text x="412" y="334" text-anchor="middle" font-size="12" fill="#d9d4e6">Feed, fingerprints,</text>
+    <text x="412" y="351" text-anchor="middle" font-size="12" fill="#d9d4e6">crawler, replay, REPL</text>
+
+    <rect x="538" y="288" width="200" height="74" rx="10" fill="#0a0612" stroke="#bc13fe" stroke-opacity="0.5"/>
+    <text x="638" y="314" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">AI triage</text>
+    <text x="638" y="334" text-anchor="middle" font-size="12" fill="#d9d4e6">Groq model picker</text>
+    <text x="638" y="351" text-anchor="middle" font-size="12" fill="#d9d4e6">refreshed from your key</text>
+
+    <rect x="312" y="386" width="200" height="68" rx="10" fill="#0a0612" stroke="#39ff14" stroke-opacity="0.6"/>
+    <text x="412" y="412" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">localStorage</text>
+    <text x="412" y="432" text-anchor="middle" font-size="12" fill="#d9d4e6">Slots, notes, snapshots, key</text>
+
+    <rect x="538" y="386" width="200" height="68" rx="10" fill="#0a0612" stroke="#22d3ee" stroke-opacity="0.6"/>
+    <text x="638" y="410" text-anchor="middle" font-size="14" font-weight="700" fill="#22d3ee" font-family="'SF Mono',Menlo,Consolas,monospace">app/sw.js</text>
+    <text x="638" y="430" text-anchor="middle" font-size="12" fill="#d9d4e6">Network-first pages, offline</text>
+    <text x="638" y="446" text-anchor="middle" font-size="12" fill="#d9d4e6">cache lazlab-hub-*</text>
+
+    <!-- External -->
+    <text x="990" y="106" text-anchor="middle" font-size="12" fill="#8f87a6" letter-spacing="2" font-family="'SF Mono',Menlo,Consolas,monospace">THE ONLY OUTSIDE CALLS</text>
+    <rect x="830" y="122" width="320" height="86" rx="12" fill="#120a1f" stroke="#ff9500" stroke-opacity="0.8"/>
+    <text x="990" y="150" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">api.groq.com</text>
+    <text x="990" y="172" text-anchor="middle" font-size="12" fill="#d9d4e6">Only when you use AI, with your own key</text>
+    <text x="990" y="190" text-anchor="middle" font-size="12" fill="#d9d4e6">Model list + triage requests</text>
+
+    <rect x="830" y="236" width="320" height="86" rx="12" fill="#120a1f" stroke="#ff9500" stroke-opacity="0.8"/>
+    <text x="990" y="264" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">cdnjs</text>
+    <text x="990" y="286" text-anchor="middle" font-size="12" fill="#d9d4e6">JSZip, html2canvas, jsPDF</text>
+    <text x="990" y="304" text-anchor="middle" font-size="12" fill="#d9d4e6">Precached for offline use</text>
+
+    <rect x="830" y="350" width="320" height="86" rx="12" fill="#120a1f" stroke="#ff9500" stroke-opacity="0.8"/>
+    <text x="990" y="378" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">Google Fonts</text>
+    <text x="990" y="400" text-anchor="middle" font-size="12" fill="#d9d4e6">Typography</text>
+    <text x="990" y="418" text-anchor="middle" font-size="12" fill="#d9d4e6">Cached after first load</text>
+
+    <text x="990" y="470" text-anchor="middle" font-size="12" fill="#39ff14">No backend. No account. No telemetry.</text>
+  </g>
+  <g stroke="#22d3ee" stroke-width="2" fill="none" marker-end="url(#ar)">
+    <line x1="513" y1="227" x2="535" y2="227"/>
+    <line x1="638" y1="266" x2="638" y2="285"/>
+    <line x1="513" y1="325" x2="535" y2="325"/>
+    <line x1="412" y1="364" x2="412" y2="383"/>
+    <line x1="740" y1="325" x2="827" y2="165"/>
+    <line x1="740" y1="430" x2="827" y2="290" stroke-opacity="0.6" stroke-dasharray="4 4"/>
+  </g>
+</svg>

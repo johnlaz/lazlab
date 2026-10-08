@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img" aria-labelledby="t d">
+  <title id="t">LAZLAB Hub</title>
+  <desc id="d">LAZLAB Hub: where every experiment gets wired. Load a build, watch it break, fix it faster.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0614"/><stop offset="1" stop-color="#040406"/>
+    </linearGradient>
+    <linearGradient id="ln" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#bc13fe"/><stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="#bc13fe" stop-opacity="0.28"/><stop offset="1" stop-color="#bc13fe" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="320" rx="20" fill="url(#bg)"/>
+  <rect width="1280" height="320" rx="20" fill="url(#glow)"/>
+  <rect x="0.5" y="0.5" width="1279" height="319" rx="19.5" fill="none" stroke="#bc13fe" stroke-opacity="0.35"/>
+  <g font-family="'SF Mono',Menlo,Consolas,'Liberation Mono',monospace" font-size="15" letter-spacing="3" fill="#22d3ee">
+    <text x="72" y="92">NEURAL COMMAND HUB</text>
+  </g>
+  <text x="68" y="172" font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="84" font-weight="800" fill="#ffffff" letter-spacing="2">LAZLAB <tspan fill="url(#ln)">HUB</tspan></text>
+  <text x="72" y="222" font-family="-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="26" fill="#d9d4e6">Where every experiment gets wired.</text>
+  <text x="72" y="264" font-family="'SF Mono',Menlo,Consolas,'Liberation Mono',monospace" font-size="15" fill="#8f87a6">Load a build  ·  Watch it break  ·  Fix it faster</text>
+  <!-- bench: three app slots with a live signal -->
+  <g transform="translate(760,70)">
+    <rect x="0" y="0" width="440" height="60" rx="12" fill="#120a1f" stroke="#bc13fe" stroke-opacity="0.6"/>
+    <circle cx="28" cy="30" r="7" fill="#39ff14"/>
+    <rect x="52" y="22" width="120" height="8" rx="4" fill="#d9d4e6" fill-opacity="0.8"/>
+    <rect x="52" y="38" width="80" height="6" rx="3" fill="#8f87a6" fill-opacity="0.7"/>
+    <rect x="352" y="18" width="72" height="24" rx="12" fill="none" stroke="#39ff14" stroke-opacity="0.7"/>
+    <text x="388" y="35" text-anchor="middle" font-family="'SF Mono',Menlo,Consolas,monospace" font-size="12" fill="#39ff14">STABLE</text>
+
+    <rect x="0" y="76" width="440" height="60" rx="12" fill="#120a1f" stroke="#22d3ee" stroke-opacity="0.6"/>
+    <circle cx="28" cy="106" r="7" fill="#ff9500"/>
+    <rect x="52" y="98" width="140" height="8" rx="4" fill="#d9d4e6" fill-opacity="0.8"/>
+    <rect x="52" y="114" width="96" height="6" rx="3" fill="#8f87a6" fill-opacity="0.7"/>
+    <rect x="364" y="94" width="60" height="24" rx="12" fill="none" stroke="#ff9500" stroke-opacity="0.8"/>
+    <text x="394" y="111" text-anchor="middle" font-family="'SF Mono',Menlo,Consolas,monospace" font-size="12" fill="#ff9500">TEST</text>
+
+    <rect x="0" y="152" width="440" height="88" rx="12" fill="#0a0612" stroke="#bc13fe" stroke-opacity="0.35"/>
+    <polyline points="16,200 70,200 90,200 104,168 120,226 136,184 152,200 230,200 246,200 258,176 272,214 288,200 360,200 376,188 392,212 408,200 424,200"
+      fill="none" stroke="url(#ln)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="424" y="172" text-anchor="end" font-family="'SF Mono',Menlo,Consolas,monospace" font-size="11" fill="#8f87a6" letter-spacing="2">LIVE SESSION</text>
+    <circle cx="136" cy="184" r="5" fill="#ff3b6b"/>
+  </g>
+</svg>
